@@ -1,22 +1,24 @@
 import React from "react";
 import learnSphere from '../assets/learnSphere.png'
 import lock from '../assets/Lock.png'
+import { Link } from 'react-router-dom';
 const Navbar = () => {
   return (
     <nav className="flex items-center justify-between px-20 py-3 bg-white border border-b-gray-300 rounded-lg">
       {/* Logo */}
       <div className="flex items-center space-x-2 ">
-        <img src={learnSphere} alt="Learn Sphere" width={120} height={40} />
+      <Link href="/">
+        <img src={learnSphere} alt="Learn Sphere" width={120} height={40} /></Link>
       </div>
 
       {/* Navigation Links */}
       <div className="hidden space-x-6 text-gray-700 md:flex">
-        <a href="#" className="font-medium text-green-600">Home</a>
-        <a href="#">Dashboard</a>
-        <a href="#">Profile</a>
-        <a href="#">Community</a>
-        <a href="#">Chain Transaction</a>
-        <a href="#">Setting</a>
+        <Link href="/Home" className="font-medium text-green-600">Home</Link>
+        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/">Profile</Link>
+        <Link href="/Community">Community</Link>
+        <Link href="/transaction">Chain Transaction</Link>
+        <Link href="/">Setting</Link>
       </div>
 
       {/* Action Buttons */}

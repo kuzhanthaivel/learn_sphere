@@ -1,6 +1,6 @@
 import Navbar from "../components/Header";
 import Footer from "../components/footer";
-import { FaArrowLeft } from "react-icons/fa";
+import { MdArrowBackIos } from "react-icons/md";
 
 export default function ChainTransaction() {
   // Sample data for the table
@@ -19,15 +19,15 @@ export default function ChainTransaction() {
     <div className="min-h-screen bg-white flex flex-col">
       <Navbar />
 
-      <main className="flex-1 px-4 py-6">
+      <main className="flex-1 px-8 py-6 ">
         <div className="max-w-7xl mx-auto">
-          <div className="flex items-center space-x-2 text-green-700 font-semibold text-xl mb-6">
-            <FaArrowLeft className="cursor-pointer" />
+          <div className="flex items-center space-x-2 text-[#20B486] font-semibold text-xl mb-6">
+            <button className="border border-gray-200 py-2 pl-3 pr-1  rounded-xl cursor-pointer text-black text-center "><MdArrowBackIos /></button>
             <span>Your Transactions</span>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
+          <div className="overflow-x-auto rounded-lg border ">
+            <table className="w-full text-left border-collapse ">
               <thead className="bg-gray-100">
                 <tr className="text-sm text-gray-600">
                   <th className="p-3 font-semibold">S.No</th>
