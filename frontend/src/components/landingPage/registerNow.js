@@ -3,18 +3,16 @@ import landingImg3 from '../../assets/landingimg2.png'
 
 const LearningJourney = () => {
   return (
-    <div className="flex items-center justify-center py-16 bg-white px-44 ">
-      <div className="flex flex-col md:flex-row items-center bg-white  rounded-xl space-y-6 gap-6 ">
-        {/* Left Section - Image */}
+    <div className="flex items-center justify-center py-16 bg-[#F0FBF7] px-44 ">
+      <div className="flex flex-col md:flex-row items-center  rounded-xl space-y-6 gap-6 ">
         <div className="w-full md:w-1/2">
           <img
-            src={landingImg3} // Replace with your image URL
+            src={landingImg3} 
             alt="Learning Journey"
             className=""
           />
         </div>
 
-        {/* Right Section - Content */}
         <div className="w-full md:w-1/2 text-center md:text-left space-y-4">
           <h1 className="text-4xl font-bold text-gray-800">
             Start Your Learning Journey with a{" "}

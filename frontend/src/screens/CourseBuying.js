@@ -139,6 +139,7 @@ export default function CourseBinding() {
               Rentals
             </button>
           </div>
+          <button className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center">Connect Wallet</button>
 
           {activeTab === "buy" ? (
             <div className="p-4">

@@ -13,13 +13,13 @@ const Footer = () => {
           <p className="text-gray-600 text-sm">Call: +1108 21 104 044</p>
           <p className="text-gray-600 text-sm">CTH road, Prakash Nagar, Nemilichery, Chennai - 602 024</p>
           <p className="text-gray-600 text-sm">Email: example@mail.com</p>
-          <div className="flex gap-4 mt-4 text-green-500">
-            <FaFacebookF className="text-xl cursor-pointer" />
-            <FaDribbble className="text-xl cursor-pointer" />
-            <FaLinkedinIn className="text-xl cursor-pointer" />
-            <FaInstagram className="text-xl cursor-pointer" />
-            <FaBehance className="text-xl cursor-pointer" />
-          </div>
+         <div className="flex gap-2 mt-4 text-[#20B486]">
+             <a href="https://facebook.com" className="text-xl cursor-pointer bg-[#E9F8F3] p-2 rounded-md  flex items-center justify-center"> <FaFacebookF /> </a>
+             <a href="https://facebook.com" className="text-xl cursor-pointer bg-[#E9F8F3] p-2 rounded-md  flex items-center justify-center"> <FaDribbble /> </a>
+             <a href="https://facebook.com" className="text-xl cursor-pointer bg-[#E9F8F3] p-2 rounded-md  flex items-center justify-center"> <FaLinkedinIn /> </a>
+             <a href="https://facebook.com" className="text-xl cursor-pointer bg-[#E9F8F3] p-2 rounded-md  flex items-center justify-center"> <FaInstagram /> </a>
+             <a href="https://facebook.com" className="text-xl cursor-pointer bg-[#E9F8F3] p-2 rounded-md  flex items-center justify-center"> <FaBehance /> </a>
+         </div>
         </div>
         
         {/* Explore */}

@@ -64,7 +64,6 @@ export default function CourseExchange() {
           </div>
         </div>
 
-        {/* Right Side - Payment Options */}
         <div className="bg-white p-6 rounded-lg shadow-md w-full lg:w-80">
           <img
             src={Image}
@@ -102,8 +101,6 @@ export default function CourseExchange() {
                  Exchange
               </button>
           </div>
-
-             
 
         </div>
       </div>

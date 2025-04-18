@@ -12,6 +12,7 @@ import Signin from './screens/Signin'
 import Transaction from './screens/chainTransaction';
 import Dashboard from './screens/dashboard';
 import Community from './screens/Community';
+import Profile from './screens/profile';
 import Home from './screens/Home'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -22,6 +23,7 @@ root.render(
         <Route path="/" element={<App />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/Community" element={<Community />} />
+        <Route path="/Profile" element={<Profile />} />
         <Route path="/CourseBuying" element={<CourseBuying />} />
         <Route path="/CourseExchange" element={<CourseExchange />} />
         <Route path="/streamingcourse" element={<StreamingCourse />} />
