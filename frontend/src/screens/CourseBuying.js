@@ -11,9 +11,8 @@ export default function CourseBinding() {
   const [rentalCost, setRentalCost] = useState(0);
   const [tokenCost, setTokenCost] = useState(0);
   const [totalPayment, setTotalPayment] = useState(0);
-  const [activeTab, setActiveTab] = useState("buy"); // 'buy' or 'rent'
+  const [activeTab, setActiveTab] = useState("buy"); 
 
-  // Dummy course data
   const courseData = {
     title: "Advanced React Development",
     shortDescription: "Master React hooks, context API, and advanced patterns",
@@ -31,8 +30,7 @@ export default function CourseBinding() {
       { id: 7, title: "Building a Complete Project" }
     ]
   };
-
-  // Duration options as percentages of full price
+ 
   const durationOptions = {
     "1 Day": { percentage: 5, tokenMultiplier: 0.2 }, 
     "3 Days": { percentage: 8, tokenMultiplier: 0.35 },

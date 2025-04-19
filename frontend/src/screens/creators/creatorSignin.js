@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Navbar from "../components/Header";
+import Navbar from "./components/Header";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -10,36 +10,7 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError(null);
 
-    try {
-      const response = await fetch("http://localhost:5001/api/students/signin", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to sign in.");
-      }
-      localStorage.setItem('studentToken', data.token);
-      // Assume the API returns a token or user data
-      console.log("Login successful:", data);
-
-      // Redirect to the dashboard or another page
-      navigate("/dashboard");
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
   };
 
   return (

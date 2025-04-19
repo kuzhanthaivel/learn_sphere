@@ -14,6 +14,10 @@ import Dashboard from './screens/dashboard';
 import Community from './screens/Community';
 import Profile from './screens/profile';
 import Home from './screens/Home'
+import CretorSignup from './screens/creators/cretorSignup'
+import CreatorSignin from './screens/creators/creatorSignin'
+import CreaorDashboard from './screens/creators/CreaorDashboard'
+import CreateCourse from './screens/creators/CreateCourse'
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -31,6 +35,10 @@ root.render(
         <Route path="/signin" element={<Signin />} />
         <Route path="/transaction" element={<Transaction />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/CretorSignup" element={<CretorSignup />} />
+        <Route path="/CreaorDashboard" element={<CreaorDashboard />} />
+        <Route path="/CreatorSignin" element={<CreatorSignin />} />
+        <Route path="/CreateCourse" element={<CreateCourse />} />
       </Routes>
     </Router>
   </React.StrictMode>

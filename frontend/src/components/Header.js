@@ -16,13 +16,12 @@ const Navbar = () => {
         <a href="/Community">Community</a>
         <a href="/transaction">Chain Transaction</a>
         <a href="/Profile">Profile</a>
-        <a href="/">Setting</a>
       </div>
 
       <div className="flex items-center space-x-4">
         <button className="flex items-center justify-center gap-2 px-4 py-2 border border-gray-300 cursor-pointer rounded-xl  ">  <img src={lock} alt="lock" className="w-5 h-5" />         <a href="/signin">Login</a></button>
         <button className="px-4 py-2 text-white bg-green-500 rounded-lg cursor-pointer"><a href="/signup">Sign up</a></button>
-        <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90">Tokens: 1470</div>
+        <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90">Coins: 1470</div>
       </div>
     </nav>
   );

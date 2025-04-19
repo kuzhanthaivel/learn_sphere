@@ -3,11 +3,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# React Native
-android/build/
-ios/Pods/
-ios/build/
-.expo/
 .vscode/
 
 # Mac OS
@@ -23,3 +18,4 @@ Thumbs.db
 # Build directories
 dist/
 build/
+.env

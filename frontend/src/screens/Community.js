@@ -119,13 +119,13 @@ const CommunityChat = () => {
       {/* Sidebar */}
       <aside className="w-16 bg-gray-800 flex flex-col items-center py-4 space-y-6">
         <button className="text-green-500 text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-          <RiCommunityLine/>
+            <RiCommunityLine/>    
         </button>
         <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-          <FaHome/>
+        <a href="/"> <FaHome/> </a>    
         </button>
         <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-          <IoSettingsOutline />
+        <a href="/CretorSignup">  <IoSettingsOutline /> </a>   
         </button>
       </aside>
 
