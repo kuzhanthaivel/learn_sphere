@@ -6,7 +6,6 @@ const path = require('path');
 
 const router = express.Router();
 
-// Configure storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/');
@@ -17,7 +16,6 @@ const storage = multer.diskStorage({
   }
 });
 
-// File filter
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -26,23 +24,22 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({
+const upload = multer({ 
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 5 
+    fileSize: 1024 * 1024 * 5 // 5MB
   },
   fileFilter: fileFilter
 });
 
 router.post('/', upload.single('image'), async (req, res) => {
   try {
-
     const { 
       email, 
       password, 
       username, 
       walletAddress, 
-      bio,  
+      bio, 
       github, 
       linkedin, 
       twitter, 
@@ -66,7 +63,11 @@ router.post('/', upload.single('image'), async (req, res) => {
       password: hashedPassword,
       username,
       walletAddress,
-      coins: 100, // Add initial coin value
+      leaderboardPoints: 100,
+      coins: 100, // Initial coins set to 100
+      badges: {
+        level1: true, 
+      },
       profile: {
         bio,
         image: req.file ? req.file.path : null,
@@ -84,7 +85,8 @@ router.post('/', upload.single('image'), async (req, res) => {
     res.status(201).json({
       message: 'Student registered successfully!',
       studentId: newStudent._id,
-      coins: newStudent.coins, // Include coin value in the response
+      coins: newStudent.coins,
+      level1: true, 
       profileImage: req.file ? req.file.path : null
     });
   } catch (err) {

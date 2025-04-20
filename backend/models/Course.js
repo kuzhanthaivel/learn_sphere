@@ -14,6 +14,7 @@ const courseSchema = new mongoose.Schema({
         S_no: Number,
         title: String,
         videoUrl: String, 
+        videoFile: String, 
       }],
     coverImage: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },

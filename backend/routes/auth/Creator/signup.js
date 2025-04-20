@@ -2,14 +2,12 @@ const express = require('express');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const path = require('path');
-const Creator = require('../../../models/Creator'); // Adjust the path to your Creator schema file
+const Creator = require('../../../models/Creator'); 
 
 const router = express.Router();
-
-// Configure Multer storage
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/'); // Directory to store uploaded images
+    cb(null, 'uploads/'); 
   },
   filename: (req, file, cb) => {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
@@ -17,7 +15,6 @@ const storage = multer.diskStorage({
   },
 });
 
-// File filter to allow only images
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -28,7 +25,7 @@ const fileFilter = (req, file, cb) => {
 
 const upload = multer({
   storage: storage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // Maximum file size: 5MB
+  limits: { fileSize: 1024 * 1024 * 5 }, 
   fileFilter: fileFilter,
 });
 

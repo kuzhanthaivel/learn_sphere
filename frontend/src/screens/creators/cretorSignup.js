@@ -145,7 +145,7 @@ export default function CreatorSignup() {
         throw new Error(data.error || 'Signup failed');
       }
       
-      navigate('/creator/dashboard');
+      navigate('/CreatorSignin');
     } catch (error) {
       console.error('Signup error:', error.message);
       setErrors(prev => ({

@@ -30,11 +30,9 @@ const LoginPage = () => {
         throw new Error(data.error || "Failed to sign in.");
       }
       localStorage.setItem('studentToken', data.token);
-      // Assume the API returns a token or user data
       console.log("Login successful:", data);
 
-      // Redirect to the dashboard or another page
-      navigate("/dashboard");
+      navigate("/Home");
     } catch (err) {
       setError(err.message);
     } finally {

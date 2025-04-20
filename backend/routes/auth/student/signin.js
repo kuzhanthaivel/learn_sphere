@@ -29,7 +29,17 @@ router.post('/', async (req, res) => {
             JWT_SECRET,
             { expiresIn: '1d' } 
         );
+        user.token = token;
+        user.coins += 2;
+        user.leaderboardPoints += 2;
 
+        if (user.badges === undefined || user.badges === null) {
+            user.badges = []; 
+        }
+
+
+        await user.save();
+        
         res.status(200).json({
             message: 'Signin successful',
             token,

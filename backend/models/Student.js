@@ -1,10 +1,9 @@
-
 const mongoose = require('mongoose');
 
 const StudentSchema = new mongoose.Schema({
- username: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  tokens: { type: String },
+  token: { type: String },
   password: { type: String, required: true },
   walletAddress: { type: String },
   coins: { type: Number, default: 0, min: 0 },
@@ -16,10 +15,29 @@ const StudentSchema = new mongoose.Schema({
   ownedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   rentedCourses: [{
     course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+    paymentMethod: { type: String, enum: ['coins', 'money'], required: true },
+    amountPaid: { type: Number, required: true, min: 0 },
+    durationDays: { type: Number,  required: true, min: 1 },
     expiryDate: { type: Date, required: true },
     rentedAt: { type: Date, default: Date.now }
   }],
-  badges: [{type: String}],
+  badges: {
+    level1: { type: Boolean, default: false },
+    level2: { type: Boolean, default: false },
+    level3: { type: Boolean, default: false },
+    level4: { type: Boolean, default: false },
+    level5: { type: Boolean, default: false },
+    level6: { type: Boolean, default: false },
+    level7: { type: Boolean, default: false },
+    level8: { type: Boolean, default: false },
+    level9: { type: Boolean, default: false },
+    level10: { type: Boolean, default: false },
+    level11: { type: Boolean, default: false },
+    level12: { type: Boolean, default: false },
+    level13: { type: Boolean, default: false },
+    level14: { type: Boolean, default: false },
+    level15: { type: Boolean, default: false },
+  },
   leaderboardPoints: { type: Number, default: 0, min: 0 },
   profile: {
     bio: { type: String, maxlength: 500 },

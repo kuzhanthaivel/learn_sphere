@@ -10,7 +10,35 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
 
+    try {
+      const response = await fetch('http://localhost:5001/api/creators/signin', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      console.log(data)
+      if (!response.ok) {
+        throw new Error(data.message || 'Sign in failed');
+      }
+
+      localStorage.setItem('creatorToken', data.token); 
+      localStorage.setItem('isCreatorLoggedIn', true);
+
+      navigate('/CreaorDashboard'); 
+
+    } catch (err) {
+      setError(err.message || 'An error occurred during sign in');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
