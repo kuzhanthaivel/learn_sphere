@@ -1,21 +1,5 @@
 import React, { useState } from "react";
-import {
-  FiUpload,
-  FiBook,
-  FiFileText,
-  FiDollarSign,
-  FiStar,
-  FiPercent,
-  FiList,
-  FiUsers,
-  FiPlus,
-  FiCheck,
-  FiTrash2,
-  FiLink,
-  FiHome,
-  FiUser,
-  FiSettings
-} from "react-icons/fi";
+import { FiUpload, FiBook, FiFileText, FiDollarSign, FiStar, FiPercent, FiList, FiUsers, FiPlus, FiCheck, FiTrash2, FiLink } from "react-icons/fi";
 import Navbar from "./components/Header";
 
 const categories = [
@@ -42,12 +26,16 @@ const UploadCourseForm = () => {
     price: "",
     rating: "",
     discount: "",
-    syllabus: [{ sno: 1, title: "", videoUri: "", videoFile: null }],
+    syllabus: [{ sno: 1, title: "", videoUrl: "", videoFile: null }],
     communityName: "",
+    coverImage: null
   });
 
   const [uploadProgress, setUploadProgress] = useState({});
   const [uploadMethod, setUploadMethod] = useState({});
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState(null);
+  const [submitSuccess, setSubmitSuccess] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -63,7 +51,7 @@ const UploadCourseForm = () => {
   const handleFileUpload = (index, file) => {
     const updatedSyllabus = [...formData.syllabus];
     updatedSyllabus[index].videoFile = file;
-    updatedSyllabus[index].videoUri = ""; // Clear URL if file is selected
+    updatedSyllabus[index].videoUrl = ""; // Clear URL if file is selected
     setFormData(prev => ({ ...prev, syllabus: updatedSyllabus }));
     
     setUploadMethod(prev => ({ ...prev, [index]: 'file' }));
@@ -82,10 +70,14 @@ const UploadCourseForm = () => {
     }, 200);
   };
 
+  const handleCoverImageUpload = (file) => {
+    setFormData(prev => ({ ...prev, coverImage: file }));
+  };
+
   const addSyllabusItem = () => {
     setFormData(prev => ({
       ...prev,
-      syllabus: [...prev.syllabus, { sno: prev.syllabus.length + 1, title: "", videoUri: "", videoFile: null }]
+      syllabus: [...prev.syllabus, { sno: prev.syllabus.length + 1, title: "", videoUrl: "", videoFile: null }]
     }));
   };
 
@@ -108,12 +100,90 @@ const UploadCourseForm = () => {
     }
   };
 
-  const handleFormSubmit = (e) => {
-    e.preventDefault();
-    console.log("Form submitted:", formData);
-    // Here you would typically send the data to your backend
-    // Note: For file uploads, you would need to use FormData
-  };
+const handleFormSubmit = async (e) => {
+  e.preventDefault();
+  setIsSubmitting(true);
+  setSubmitError(null);
+  setSubmitSuccess(false);
+
+  try {
+    const creatorToken = localStorage.getItem('creatorToken');
+    if (!creatorToken) {
+      throw new Error('Creator not authenticated. Please sign in.');
+    }
+
+    // Create FormData object
+    const formDataToSend = new FormData();
+
+    // Add basic form fields
+    formDataToSend.append('title', formData.title);
+    formDataToSend.append('shortDescription', formData.shortDescription);
+    formDataToSend.append('fullDescription', formData.fullDescription);
+    formDataToSend.append('category', formData.category);
+    formDataToSend.append('price', formData.price);
+    formDataToSend.append('rating', formData.rating);
+    formDataToSend.append('discount', formData.discount);
+    formDataToSend.append('communityName', formData.communityName);
+
+    // Add cover image if exists
+    if (formData.coverImage) {
+      formDataToSend.append('coverImage', formData.coverImage);
+    }
+
+    // Prepare syllabus data
+    const syllabusData = formData.syllabus.map(item => ({
+      title: item.title,
+      videoUrl: item.videoUrl,
+      videoFile: item.videoFile ? item.videoFile.name : null
+    }));
+    formDataToSend.append('syllabus', JSON.stringify(syllabusData));
+
+    // Add video files
+    formData.syllabus.forEach(item => {
+      if (item.videoFile) {
+        formDataToSend.append('syllabusVideos', item.videoFile);
+      }
+    });
+
+    // Send request to server
+    const response = await fetch('http://localhost:5001/api/createCourse', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${creatorToken}`
+        // Don't set Content-Type - let the browser set it with boundary
+      },
+      body: formDataToSend
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Failed to create course');
+    }
+
+    setSubmitSuccess(true);
+    // Reset form after successful submission
+    setFormData({
+      title: "",
+      shortDescription: "",
+      fullDescription: "",
+      category: "",
+      price: "",
+      rating: "",
+      discount: "",
+      syllabus: [{ sno: 1, title: "", videoUrl: "", videoFile: null }],
+      communityName: "",
+      coverImage: null
+    });
+    setUploadProgress({});
+    setUploadMethod({});
+  } catch (error) {
+    console.error('Error submitting form:', error);
+    setSubmitError(error.message || 'An error occurred while submitting the form');
+  } finally {
+    setIsSubmitting(false);
+  }
+};
 
   return (
     <div>
@@ -129,6 +199,18 @@ const UploadCourseForm = () => {
             </div>
             
             <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
+              {/* Display success/error messages */}
+              {submitSuccess && (
+                <div className="p-4 bg-green-100 text-green-700 rounded-lg">
+                  Course created successfully!
+                </div>
+              )}
+              {submitError && (
+                <div className="p-4 bg-red-100 text-red-700 rounded-lg">
+                  {submitError}
+                </div>
+              )}
+
               {/* Title */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="col-span-2">
@@ -193,13 +275,23 @@ const UploadCourseForm = () => {
                     <div className="flex text-sm text-gray-600 justify-center">
                       <label className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
                         <span>Upload a file</span>
-                        <input type="file" className="sr-only" />
+                        <input 
+                          type="file" 
+                          className="sr-only" 
+                          onChange={(e) => handleCoverImageUpload(e.target.files[0])}
+                          accept="image/*"
+                        />
                       </label>
                       <p className="pl-1">or drag and drop</p>
                     </div>
                     <p className="text-xs text-gray-500">
                       PNG, JPG, GIF up to 10MB
                     </p>
+                    {formData.coverImage && (
+                      <p className="text-sm text-green-600 mt-2">
+                        {formData.coverImage.name} selected
+                      </p>
+                    )}
                   </div>
                 </div>
               </div>
@@ -330,9 +422,9 @@ const UploadCourseForm = () => {
                             <input
                               type="text"
                               placeholder="Video URL (YouTube, Vimeo, etc.)"
-                              value={item.videoUri}
+                              value={item.videoUrl}
                               onChange={(e) => {
-                                handleSyllabusChange(index, "videoUri", e.target.value);
+                                handleSyllabusChange(index, "videoUrl", e.target.value);
                                 handleSyllabusChange(index, "videoFile", null);
                               }}
                               className="w-full p-3 border border-gray-300 rounded-lg"
@@ -416,10 +508,23 @@ const UploadCourseForm = () => {
               <div className="pt-4">
                 <button
                   type="submit"
-                  className="w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition"
+                  disabled={isSubmitting}
+                  className={`w-full flex justify-center items-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition ${isSubmitting ? 'opacity-70 cursor-not-allowed' : ''}`}
                 >
-                  <FiCheck className="mr-2" />
-                  Submit Course
+                  {isSubmitting ? (
+                    <>
+                      <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                      </svg>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <FiCheck className="mr-2" />
+                      Submit Course
+                    </>
+                  )}
                 </button>
               </div>
             </form>

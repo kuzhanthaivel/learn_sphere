@@ -70,7 +70,7 @@ const verifyCreatorToken = (token) => {
 };
 
 // Create Course API
-router.post('/create', async (req, res) => {
+router.post('/', async (req, res) => {
   // First handle cover image upload
   uploadCoverImage(req, res, async (err) => {
     if (err) {

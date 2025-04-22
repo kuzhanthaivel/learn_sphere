@@ -10,7 +10,7 @@ const StudentSchema = new mongoose.Schema({
   completedCourses: [{ 
     course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
     completedAt: { type: Date, default: Date.now },
-    certificate: { type: String }
+    certificateID: { type: String }
   }],
   ownedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   rentedCourses: [{

@@ -9,6 +9,7 @@ const creatorSignupRoute = require('./routes/auth/Creator/signup');
 const creatorSigninRoute = require('./routes/auth/Creator/signin'); 
 const studentMeRoute = require('./routes/auth/student/auth'); 
 const creatorMeRoute = require('./routes/auth/Creator/auth'); 
+const createCourse = require('./routes/courseCreations/createCourse'); 
 const moment = require("moment");
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.use('/api/creators/signup', creatorSignupRoute);
 app.use('/api/creators/signin', creatorSigninRoute);
 app.use('/api/students/me', studentMeRoute);
 app.use('/api/creator/me', creatorMeRoute);
+app.use('/api/createCourse', createCourse);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
