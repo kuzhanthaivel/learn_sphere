@@ -49,7 +49,7 @@ const StudentSchema = new mongoose.Schema({
       portfolio: { type: String },
     }
   },
-  communities: [String],
+  communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
   createdAt: { type: Date, default: Date.now },
   lastActive: { type: Date, default: Date.now }
 });

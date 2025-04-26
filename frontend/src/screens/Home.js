@@ -77,7 +77,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Music", 
       description: "Learn the fundamentals of music theory and composition from industry professionals.", 
-      price: "$49.99",
+      price: "₹49.99",
       rating: 4
     },
     { 
@@ -86,7 +86,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Design", 
       description: "Master the principles of user interface and experience design with practical projects.", 
-      price: "$59.99",
+      price: "₹59.99",
       rating: 5
     },
     { 
@@ -95,7 +95,7 @@ export default function Home() {
       coverImage: CoverImage3,
       category: "Development", 
       description: "Complete course covering HTML, CSS, JavaScript and modern frameworks.", 
-      price: "$79.99",
+      price: "₹79.99",
       rating: 4
     },
     { 
@@ -104,7 +104,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Photography", 
       description: "Take your photography skills to the next level with advanced techniques.", 
-      price: "$39.99",
+      price: "₹39.99",
       rating: 3
     },
     { 
@@ -113,7 +113,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Marketing", 
       description: "Learn SEO, social media marketing, and content strategy from experts.", 
-      price: "$69.99",
+      price: "₹69.99",
       rating: 4
     },
     { 
@@ -122,7 +122,7 @@ export default function Home() {
       coverImage: CoverImage3,
       category: "Finance", 
       description: "Understand personal finance, investments, and retirement planning.", 
-      price: "$45.99",
+      price: "₹45.99",
       rating: 5
     },
     { 
@@ -131,7 +131,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Data Science", 
       description: "Learn Python programming and data analysis with real-world datasets.", 
-      price: "$54.99",
+      price: "₹54.99",
       rating: 4
     },
     { 
@@ -140,7 +140,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Development", 
       description: "Build cross-platform mobile applications using Flutter framework.", 
-      price: "$64.99",
+      price: "₹64.99",
       rating: 4
     },
     { 
@@ -149,7 +149,7 @@ export default function Home() {
       coverImage: CoverImage3,
       category: "Design", 
       description: "From basics to advanced techniques in Adobe Photoshop and Illustrator.", 
-      price: "$49.99",
+      price: "₹49.99",
       rating: 5
     },
     { 
@@ -158,7 +158,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Personal Develop", 
       description: "Boost your productivity with time management and organization skills.", 
-      price: "$29.99",
+      price: "₹29.99",
       rating: 3
     },
     { 
@@ -167,7 +167,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Health & Fitness", 
       description: "Start your yoga journey with basic poses and breathing techniques.", 
-      price: "$34.99",
+      price: "₹34.99",
       rating: 4
     },
     { 
@@ -176,7 +176,7 @@ export default function Home() {
       coverImage: CoverImage3,
       category: "Finance", 
       description: "Understand blockchain technology and cryptocurrency basics.", 
-      price: "$59.99",
+      price: "₹59.99",
       rating: 4
     },
     { 
@@ -185,7 +185,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Personal Develop", 
       description: "Overcome stage fright and deliver powerful presentations.", 
-      price: "$39.99",
+      price: "₹39.99",
       rating: 5
     },
     { 
@@ -194,7 +194,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Data Science", 
       description: "Introduction to machine learning algorithms and applications.", 
-      price: "$74.99",
+      price: "₹74.99",
       rating: 4
     },
     { 
@@ -203,7 +203,7 @@ export default function Home() {
       coverImage: CoverImage3,
       category: "Photography", 
       description: "Professional video editing techniques for beginners.", 
-      price: "$44.99",
+      price: "₹44.99",
       rating: 4
     },
     { 
@@ -212,7 +212,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Business", 
       description: "Learn how to start and grow your own business successfully.", 
-      price: "$49.99",
+      price: "₹49.99",
       rating: 5
     },
     { 
@@ -221,7 +221,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Health & Fitness", 
       description: "Science-backed nutrition strategies for sustainable weight management.", 
-      price: "$39.99",
+      price: "₹39.99",
       rating: 4
     },
     { 
@@ -230,7 +230,7 @@ export default function Home() {
       coverImage: CoverImage3,
       category: "Development", 
       description: "Build native iOS applications using Swift and Xcode.", 
-      price: "$69.99",
+      price: "₹69.99",
       rating: 4
     },
     { 
@@ -239,7 +239,7 @@ export default function Home() {
       coverImage: CoverImage1,
       category: "Marketing", 
       description: "Learn to create engaging content for websites and social media.", 
-      price: "$34.99",
+      price: "₹34.99",
       rating: 3
     },
     { 
@@ -248,7 +248,7 @@ export default function Home() {
       coverImage: CoverImage2,
       category: "Music", 
       description: "Start playing guitar with easy-to-follow lessons and exercises.", 
-      price: "$29.99",
+      price: "₹29.99",
       rating: 4
     }
   ];

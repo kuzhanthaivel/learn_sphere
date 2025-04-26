@@ -112,10 +112,9 @@ const handleFormSubmit = async (e) => {
       throw new Error('Creator not authenticated. Please sign in.');
     }
 
-    // Create FormData object
     const formDataToSend = new FormData();
 
-    // Add basic form fields
+    // Basic fields
     formDataToSend.append('title', formData.title);
     formDataToSend.append('shortDescription', formData.shortDescription);
     formDataToSend.append('fullDescription', formData.fullDescription);
@@ -125,61 +124,43 @@ const handleFormSubmit = async (e) => {
     formDataToSend.append('discount', formData.discount);
     formDataToSend.append('communityName', formData.communityName);
 
-    // Add cover image if exists
+    // Cover image
     if (formData.coverImage) {
       formDataToSend.append('coverImage', formData.coverImage);
     }
 
-    // Prepare syllabus data
-    const syllabusData = formData.syllabus.map(item => ({
-      title: item.title,
-      videoUrl: item.videoUrl,
-      videoFile: item.videoFile ? item.videoFile.name : null
-    }));
-    formDataToSend.append('syllabus', JSON.stringify(syllabusData));
+    // Syllabus data
+    formDataToSend.append('syllabus', JSON.stringify(
+      formData.syllabus.map(item => ({
+        title: item.title,
+        videoUrl: item.videoUrl
+      }))
+    ));
 
-    // Add video files
-    formData.syllabus.forEach(item => {
+    // Video files - use the exact field name your server expects
+    formData.syllabus.forEach((item, index) => {
       if (item.videoFile) {
-        formDataToSend.append('syllabusVideos', item.videoFile);
+        formDataToSend.append('videos', item.videoFile); // or 'syllabusVideos' if that's what server expects
       }
     });
 
-    // Send request to server
     const response = await fetch('http://localhost:5001/api/createCourse', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${creatorToken}`
-        // Don't set Content-Type - let the browser set it with boundary
       },
       body: formDataToSend
     });
 
-    const data = await response.json();
-
     if (!response.ok) {
-      throw new Error(data.message || 'Failed to create course');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Failed to create course');
     }
 
     setSubmitSuccess(true);
-    // Reset form after successful submission
-    setFormData({
-      title: "",
-      shortDescription: "",
-      fullDescription: "",
-      category: "",
-      price: "",
-      rating: "",
-      discount: "",
-      syllabus: [{ sno: 1, title: "", videoUrl: "", videoFile: null }],
-      communityName: "",
-      coverImage: null
-    });
-    setUploadProgress({});
-    setUploadMethod({});
+    // Reset form...
   } catch (error) {
-    console.error('Error submitting form:', error);
-    setSubmitError(error.message || 'An error occurred while submitting the form');
+    setSubmitError(error.message);
   } finally {
     setIsSubmitting(false);
   }

@@ -4,7 +4,6 @@ const CommunitySchema = new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   description: { type: String, maxlength: 500 },
   coverImage: { type: String },
-  course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course', required: true },
   members: [{
     user: { type: mongoose.Schema.Types.ObjectId, refPath: 'members.userType' },
     userType: { type: String, enum: ['Student', 'Creator'] },

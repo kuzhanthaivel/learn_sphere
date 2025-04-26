@@ -8,6 +8,7 @@ const CreatorSchema = new mongoose.Schema({
   walletAddress: { type: String, unique: true, sparse: true },
   token: { type: String },
   createdCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+  communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
   profile: {
     bio: { type: String, maxlength: 1000 },
     image: { type: String },

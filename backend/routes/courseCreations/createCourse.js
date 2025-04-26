@@ -50,13 +50,13 @@ const videoFilter = (req, file, cb) => {
 // Upload middlewares
 const uploadCoverImage = multer({
   storage: coverImageStorage,
-  limits: { fileSize: 1024 * 1024 * 5 }, // 5MB limit
+  limits: { fileSize: 1024 * 1024 * 10 }, // 10MB limit
   fileFilter: imageFilter,
 }).single('coverImage');
 
 const uploadVideo = multer({
   storage: videoStorage,
-  limits: { fileSize: 1024 * 1024 * 50 }, // 50MB limit
+  limits: { fileSize: 1024 * 1024 * 100 }, // 100MB limit
   fileFilter: videoFilter,
 }).array('syllabusVideos', 10); // Max 10 videos at once
 
@@ -183,7 +183,7 @@ router.post('/', async (req, res) => {
               return {
                 ...item,
                 videoFile: videoFileMap[index],
-                videoUrl: item.videoUrl || null // Clear URL if file is uploaded
+                videoUrl: item.videoUrl || null
               };
             }
             return item;
@@ -198,22 +198,26 @@ router.post('/', async (req, res) => {
       // Process video uploads if any
       const processedSyllabus = await processVideoUploads();
 
-      // Create community
+      // First create the community
       const community = new Community({
         name: communityName || `${title} Community`,
         description: `Community for ${title} course`,
-        course: null, // Will be updated after course creation
         members: [{
           user: creator._id,
           userType: 'Creator',
-          role: 'Creator'
+          role: 'Creator',
+          joinedAt: Date.now()
         }],
         messages: []
       });
 
       const savedCommunity = await community.save();
 
-      // Create course
+      // Add community to creator's communities array
+      creator.communities.push(savedCommunity._id);
+      await creator.save();
+
+      // Now create the course with community reference
       const course = new Course({
         title,
         shortDescription,
@@ -235,17 +239,13 @@ router.post('/', async (req, res) => {
 
       const savedCourse = await course.save();
 
-      // Update community with course reference
-      savedCommunity.course = savedCourse._id;
-      await savedCommunity.save();
-
       // Update creator's created courses
       creator.createdCourses.push(savedCourse._id);
       await creator.save();
 
       return res.status(201).json({
         success: true,
-        message: 'Course created successfully',
+        message: 'Course and community created successfully',
         data: {
           course: savedCourse,
           community: savedCommunity

@@ -92,7 +92,7 @@ const LoginPage = () => {
             </div>
             <div className="text-center text-sm text-gray-600">
               Don't have an account?{" "}
-              <a href="/signup" className="font-semibold text-[#FF7F00] hover:underline transition-colors">
+              <a href="/CretorSignup" className="font-semibold text-[#FF7F00] hover:underline transition-colors">
                 Sign up
               </a>
             </div>
