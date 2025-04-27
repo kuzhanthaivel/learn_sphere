@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import learnSphere from '../assets/learnSphere.png';
 import lock from '../assets/Lock.png';
 import defaultProfile from '../assets/defaultProfile.png';
@@ -29,7 +30,7 @@ const Navbar = () => {
             'Content-Type': 'application/json'
           }
         });
-        
+          
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
@@ -123,11 +124,21 @@ const Navbar = () => {
       {/* Desktop Navigation */}
       {authStatus === 'loggedIn' && (
         <div className="hidden space-x-6 text-gray-700 md:flex">
-          <Link to="/Home" className="font-medium text-green-600 hover:text-green-700">Home</Link>
-          <Link to="/dashboard" className="hover:text-gray-900">Dashboard</Link>
-          <Link to="/Community" className="hover:text-gray-900">Community</Link>
-          <Link to="/transaction" className="hover:text-gray-900">Chain Transaction</Link>
-          <Link to="/Profile" className="hover:text-gray-900">Profile</Link>
+          <NavLink to="/Home"       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Home</NavLink>
+          <NavLink to="/dashboard"       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Dashboard</NavLink>
+          <NavLink to="/Community"       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Community</NavLink>
+          <NavLink to="/transaction"       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Chain Transaction</NavLink>
+          <NavLink to="/Profile"       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Profile</NavLink>
         </div>
       )}
 
@@ -136,7 +147,7 @@ const Navbar = () => {
         <div className="absolute left-0 right-0 z-20 flex flex-col items-center py-4 mt-2 space-y-4 bg-white border-b border-gray-200 top-16 md:hidden">
           {authStatus === 'loggedIn' && (
             <>
-              <Link to="/Home" className="font-medium text-green-600" onClick={() => setMobileMenuOpen(false)}>Home</Link>
+              <Link to="/Home" className="font-medium text-green-600" onClick={() => setMobileMenuOpen(false)} >Home</Link>
               <Link to="/dashboard" onClick={() => setMobileMenuOpen(false)}>Dashboard</Link>
               <Link to="/Community" onClick={() => setMobileMenuOpen(false)}>Community</Link>
               <Link to="/transaction" onClick={() => setMobileMenuOpen(false)}>Chain Transaction</Link>

@@ -12,6 +12,7 @@ import Signin from './screens/Signin'
 import Transaction from './screens/chainTransaction';
 import Dashboard from './screens/dashboard';
 import Community from './screens/Community';
+import CreatorCommunity from './screens/creators/creatorCommunity';
 import Profile from './screens/profile';
 import Home from './screens/Home'
 import CretorSignup from './screens/creators/cretorSignup'
@@ -27,8 +28,9 @@ root.render(
         <Route path="/" element={<App />} />
         <Route path="/Home" element={<Home />} />
         <Route path="/Community" element={<Community />} />
+        <Route path="/CreatorCommunity" element={<CreatorCommunity />} />
         <Route path="/Profile" element={<Profile />} />
-        <Route path="/CourseBuying" element={<CourseBuying />} />
+        <Route path="/CourseBuying/:id" element={<CourseBuying />} />
         <Route path="/CourseExchange" element={<CourseExchange />} />
         <Route path="/streamingcourse" element={<StreamingCourse />} />
         <Route path="/signup" element={<Signup />} />

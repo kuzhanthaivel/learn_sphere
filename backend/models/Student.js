@@ -7,20 +7,26 @@ const StudentSchema = new mongoose.Schema({
   password: { type: String, required: true },
   walletAddress: { type: String },
   coins: { type: Number, default: 0, min: 0 },
-  completedCourses: [{ 
-    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-    completedAt: { type: Date, default: Date.now },
-    certificateID: { type: String }
-  }],
+  completedCourses: { 
+    type: [{ 
+      course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+      completedAt: { type: Date, default: Date.now },
+      certificateID: { type: String }
+    }], 
+    default: [] 
+  },
   ownedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
-  rentedCourses: [{
-    course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
-    paymentMethod: { type: String, enum: ['coins', 'money'], required: true },
-    amountPaid: { type: Number, required: true, min: 0 },
-    durationDays: { type: Number,  required: true, min: 1 },
-    expiryDate: { type: Date, required: true },
-    rentedAt: { type: Date, default: Date.now }
-  }],
+  rentedCourses: { 
+    type: [{ 
+      course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+      paymentMethod: { type: String, enum: ['coins', 'money'], required: true },
+      amountPaid: { type: Number, required: true, min: 0 },
+      durationDays: { type: Number, required: true, min: 1 },
+      expiryDate: { type: Date, required: true },
+      rentedAt: { type: Date, default: Date.now }
+    }], 
+    default: [] 
+  },
   badges: {
     level1: { type: Boolean, default: false },
     level2: { type: Boolean, default: false },
@@ -49,7 +55,7 @@ const StudentSchema = new mongoose.Schema({
       portfolio: { type: String },
     }
   },
-  communities: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }],
+  communities: { type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Community' }], default: [] },
   createdAt: { type: Date, default: Date.now },
   lastActive: { type: Date, default: Date.now }
 });

@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import learnSphere from '../../../assets/learnSphere.png';
 import lock from '../../../assets/Lock.png';
 import defaultProfile from '../../../assets/defaultProfile.png';
-
+import { NavLink } from "react-router-dom";
 const Navbar = () => {
   const [authStatus, setAuthStatus] = useState('loading');
   const [creatorData, setCreatorData] = useState(null);
@@ -101,9 +101,15 @@ const Navbar = () => {
       {/* Navigation Links */}
       {authStatus === 'loggedIn' && (
         <div className="hidden space-x-6 text-gray-700 md:flex">
-          <Link to="/CreateCourse" className="font-medium text-green-600">Create Course</Link>
-          <Link to="/CreaorDashboard">Dashboard</Link>
-          <Link to="/Community">Community</Link>
+          <NavLink to="/CreateCourse"      className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      } >Create Course</NavLink>
+          <NavLink to="/CreaorDashboard"       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Dashboard</NavLink>
+          <NavLink to="/CreatorCommunity "       className={({ isActive }) => 
+        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+      }>Community</NavLink>
         </div>
       )}
 

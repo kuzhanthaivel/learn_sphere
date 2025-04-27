@@ -8,8 +8,12 @@ const studentSigninRoute = require('./routes/auth/student/signin');
 const creatorSignupRoute = require('./routes/auth/Creator/signup'); 
 const creatorSigninRoute = require('./routes/auth/Creator/signin'); 
 const studentMeRoute = require('./routes/auth/student/auth'); 
+const studentDashboard = require('./routes/student/dashboard'); 
 const creatorMeRoute = require('./routes/auth/Creator/auth'); 
-const createCourse = require('./routes/courseCreations/createCourse'); 
+const createCourse = require('./routes/course/createCourse'); 
+const FetchById = require('./routes/course/fetchById'); 
+const fetchAllCoures = require('./routes/course/fetchAllCoures'); 
+const Buy = require('./routes/transaction/buy'); 
 const moment = require("moment");
 dotenv.config();
 
@@ -38,6 +42,10 @@ app.use('/api/creators/signin', creatorSigninRoute);
 app.use('/api/students/me', studentMeRoute);
 app.use('/api/creator/me', creatorMeRoute);
 app.use('/api/createCourse', createCourse);
+app.use('/api/fetchAllCoures', fetchAllCoures);
+app.use('/api/fetchById', FetchById);
+app.use('/api/buy', Buy);
+app.use('/api/students/studentDashboard', studentDashboard);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

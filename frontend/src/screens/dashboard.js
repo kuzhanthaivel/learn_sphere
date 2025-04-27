@@ -1,33 +1,36 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { BsArrowUpRightSquareFill } from "react-icons/bs";
-import { FaStar } from "react-icons/fa";
+import { FaStar, FaUsers as FaCommunity } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import CoverImage1 from "../assets/CoverImage1.png";
 import CoverImage2 from "../assets/CoverImage2.png";
 import CoverImage3 from "../assets/CoverImage3.png";
 import Mycourse from '../assets/MyCourse.png'
+import { useNavigate } from 'react-router-dom';
 
 const CourseCard = ({ 
   id,
   category, 
   coverImage, 
-  isSelected, 
-  onClick, 
   title, 
-  description, 
+  description,
+  community,
+  onCommunityClick
 }) => {
+      // Construct the full image URL for uploaded images
+      const imageUrl = coverImage 
+        ? `http://localhost:5001/${coverImage.replace(/\\/g, '/')}`
+        : CoverImage1; // Fallback to default image if none uploaded
+      
   return (
-    <div
-      className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105"
-      onClick={onClick}
-    >
+    <div className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105">
       <div className="relative">
         <div className="absolute bg-white left-1 top-1 px-2 py-1 rounded-lg bg-opacity-50">
           {category}
         </div>
         <img 
-          src={coverImage} 
+          src={imageUrl}
           className="w-full h-32 object-cover" 
           alt={`${title} course cover`} 
         />
@@ -37,12 +40,17 @@ const CourseCard = ({
         <p className="text-gray-400 text-sm line-clamp-2">{description}</p>
       </div>
       <div className="flex justify-between items-center w-full pt-2">
-        {/* progressBar */}
+        <button 
+          className="text-xs bg-blue-500 text-white px-2 py-1 rounded flex items-center"
+          onClick={(e) => {
+            e.stopPropagation();
+            onCommunityClick(community);
+          }}
+        >
+          <FaCommunity className="mr-1" /> Community
+        </button>
         <BsArrowUpRightSquareFill
-          className={`text-2xl w-6 h-6 rounded-md ${
-            isSelected ? "bg-white text-green-500" : "bg-green-500 text-white"
-          }`}
-
+          className="text-2xl w-6 h-6 rounded-md hover:bg-white hover:text-green-500 bg-green-500 text-white"
         />
       </div>
     </div>
@@ -50,69 +58,61 @@ const CourseCard = ({
 };
 
 export default function Dashboard() {
-  const [selectedCourse, setSelectedCourse] = useState(null);
+  const navigate = useNavigate();
+  const [courses, setCourses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 4;
 
-  const courses = [
-    { 
-      id: 1,
-      title: "Introduction to Music Theory", 
-      coverImage: CoverImage1,
-      category: "Music", 
-      description: "Learn the fundamentals of music theory and composition.", 
-    },
-    { 
-      id: 2,
-      title: "UI/UX Design Fundamentals", 
-      coverImage: CoverImage2,
-      category: "Design", 
-      description: "Master the principles of user interface design.", 
-    },
-    { 
-      id: 3,
-      title: "Web Development Bootcamp", 
-      coverImage: CoverImage3,
-      category: "Development", 
-      description: "Complete course covering HTML, CSS, JavaScript.", 
-    },
-    { 
-      id: 4,
-      title: "Advanced Photography", 
-      coverImage: CoverImage1,
-      category: "Photography", 
-      description: "Take your photography skills to the next level.", 
-    },
-    { 
-      id: 5,
-      title: "Digital Marketing Masterclass", 
-      coverImage: CoverImage2,
-      category: "Marketing", 
-      description: "Learn SEO, social media marketing strategies.", 
-    },
-    { 
-      id: 6,
-      title: "Financial Planning Basics", 
-      coverImage: CoverImage3,
-      category: "Finance", 
-      description: "Understand personal finance and investments.", 
-    },
-    { 
-      id: 7,
-      title: "Python for Data Science", 
-      coverImage: CoverImage1,
-      category: "Data Science", 
-      description: "Learn Python programming and data analysis.", 
-    },
-    { 
-      id: 8,
-      title: "Mobile App Development", 
-      coverImage: CoverImage2,
-      category: "Development", 
-      description: "Build cross-platform mobile applications.", 
-    }
-  ];
+  useEffect(() => {
+    const fetchOwnedCourses = async () => {
+      try {
+        const token = localStorage.getItem('studentToken');
+        if (!token) {
+          throw new Error('No authentication token found');
+        }
 
+        const response = await fetch('http://localhost:5001/api/students/studentDashboard/owned-courses', {
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        if (data.success && data.data) {
+          setCourses(data.data);
+        } else {
+          throw new Error('Failed to fetch courses');
+        }
+      } catch (err) {
+        console.error('Error fetching courses:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOwnedCourses();
+  }, []);
+
+  const handleCommunityClick = (communityId) => {
+    // Navigate to community page or show community details
+    console.log('Community ID:', communityId);
+    // navigate(`/community/${communityId}`);
+  };
+
+  const handleCourseClick = (courseId) => {
+    // Navigate to course details page
+    navigate(`/course/${courseId}`);
+  };
+
+  // Pagination logic
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);
@@ -120,66 +120,100 @@ export default function Dashboard() {
 
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
+  if (loading) {
+    return (
+      <div className="bg-[#E9F8F3] min-h-screen">
+        <Header />
+        <div className="w-full mx-auto bg-white p-4 rounded-lg scale-95 flex justify-center items-center h-64">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+                <span className="ml-3 text-gray-600">Loading data...</span>
+              </div>
+        <Footer />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="bg-[#E9F8F3] min-h-screen">
+        <Header />
+        <div className="flex justify-center items-center h-64">
+          <p className="text-red-500">Error: {error}</p>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
     <div className="bg-[#E9F8F3]">
       <Header />
 
-           <div className='flex p-20 '>
-           <div className='items-center flex'>
-        <img 
-          src={Mycourse} 
-          className="w-52" 
-          alt="my Courses Section" 
-        />
-      </div>
-
-      <div className="container px-4 py-8 ">        
-        <div className="grid grid-rows-1 grid-cols-4 gap-4">
-          {currentCourses.map((course) => (
-            <CourseCard
-              key={course.id}
-              id={course.id}
-              title={course.title}
-              coverImage={course.coverImage}
-              category={course.category}
-              description={course.description}
-              isSelected={selectedCourse === course.id}
-              onClick={() => setSelectedCourse(course.id)}
-            />
-          ))}
+      <div className='flex p-20 '>
+        <div className='items-center flex'>
+          <img 
+            src={Mycourse} 
+            className="w-52" 
+            alt="my Courses Section" 
+          />
         </div>
 
-        {courses.length > coursesPerPage && (
-          <div className="flex justify-center mt-8">
-            <nav className="inline-flex rounded-md shadow">
-              <button
-                onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Previous
-              </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
-                <button
-                  key={number}
-                  onClick={() => paginate(number)}
-                  className={`px-4 py-2 border-t border-b border-gray-300 text-sm font-medium ${currentPage === number ? 'bg-green-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
-                >
-                  {number}
-                </button>
-              ))}
-              <button
-                onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
-              >
-                Next
-              </button>
-            </nav>
-          </div>
-        )}
+        <div className="container px-4 py-8 ">        
+          {courses.length === 0 ? (
+            <div className="text-center py-10">
+              <p>You don't have any courses yet.</p>
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-rows-1 grid-cols-4 gap-10">
+                {currentCourses.map((course) => (
+                  <div key={course.id} onClick={() => handleCourseClick(course.id)}>
+                    <CourseCard
+                      id={course.id}
+                      title={course.title}
+                      coverImage={course.coverImage}
+                      category={course.category}
+                      description={course.shortDescription}
+                      community={course.community}
+                      onCommunityClick={handleCommunityClick}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              {courses.length > coursesPerPage && (
+                <div className="flex justify-center mt-8">
+                  <nav className="inline-flex rounded-md shadow">
+                    <button
+                      onClick={() => paginate(currentPage > 1 ? currentPage - 1 : 1)}
+                      disabled={currentPage === 1}
+                      className="px-4 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      Previous
+                    </button>
+                    {Array.from({ length: totalPages }, (_, i) => i + 1).map(number => (
+                      <button
+                        key={number}
+                        onClick={() => paginate(number)}
+                        className={`px-4 py-2 border-t border-b border-gray-300 text-sm font-medium ${currentPage === number ? 'bg-green-500 text-white' : 'bg-white text-gray-700 hover:bg-gray-50'}`}
+                      >
+                        {number}
+                      </button>
+                    ))}
+                    <button
+                      onClick={() => paginate(currentPage < totalPages ? currentPage + 1 : totalPages)}
+                      disabled={currentPage === totalPages}
+                      className="px-4 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+                    >
+                      Next
+                    </button>
+                  </nav>
+                </div>
+              )}
+            </>
+          )}
+        </div>
       </div>
-           </div>
 
       <Footer />
     </div>

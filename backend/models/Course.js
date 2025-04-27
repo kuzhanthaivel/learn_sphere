@@ -16,6 +16,7 @@ const courseSchema = new mongoose.Schema({
         videoUrl: String, 
         videoFile: String, 
       }],
+    students: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Student' }],
     coverImage: { type: String, required: true },
     createdAt: { type: Date, default: Date.now },
   });
