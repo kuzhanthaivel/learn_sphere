@@ -73,7 +73,7 @@ export default function Dashboard() {
           throw new Error('No authentication token found');
         }
 
-        const response = await fetch('http://localhost:5001/api/students/studentDashboard/owned-courses', {
+        const response = await fetch('http://localhost:5001/api/students/studentDashboard', {
           headers: {
             'Authorization': `Bearer ${token}`,
             'Content-Type': 'application/json'
@@ -109,7 +109,7 @@ export default function Dashboard() {
 
   const handleCourseClick = (courseId) => {
     // Navigate to course details page
-    navigate(`/course/${courseId}`);
+    navigate(`/streamingcourse/${courseId}`);
   };
 
   // Pagination logic

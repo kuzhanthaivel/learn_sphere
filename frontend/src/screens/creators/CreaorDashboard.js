@@ -10,7 +10,6 @@ const CourseCard = ({
   id,
   category, 
   coverImage, 
-  onClick, 
   title, 
   students,
   rating 
@@ -18,7 +17,6 @@ const CourseCard = ({
   return (
     <div
       className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105"
-      onClick={onClick}
     >
       <div className="relative">
         <div className="absolute bg-white left-1 top-1 px-2 py-1 rounded-lg bg-opacity-50">
@@ -63,20 +61,8 @@ const CourseCard = ({
   );
 };
 
-const AddNewCourseCard = ({ onClick }) => {
-  return (
-    <div
-      className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105 flex flex-col items-center justify-center"
-      onClick={onClick}
-    >
-      <BsPlusSquareFill className="text-4xl text-gray-400 mb-2" />
-      <p className="text-gray-600 font-medium">Create New Course</p>
-    </div>
-  );
-};
 
 export default function CreatorDashboard() {
-  const [selectedCourse, setSelectedCourse] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const coursesPerPage = 4;
 
@@ -157,7 +143,6 @@ export default function CreatorDashboard() {
 
   const stats = [
     { title: "Total Students", value: "2,118", icon: <FaUsers className="text-2xl" />, change: "+12%", trend: "up" },
-    { title: "Total Earnings", value: "$10,590", icon: <FaMoneyBillWave className="text-2xl" />, change: "+8%", trend: "up" },
     { title: "Average Rating", value: "4.7", icon: <FaStar className="text-2xl" />, change: "+0.2", trend: "up" },
     { title: "Courses Published", value: "8", icon: <BsArrowUpRightSquareFill className="text-2xl" />, change: "+2", trend: "up" }
   ];
@@ -182,21 +167,18 @@ export default function CreatorDashboard() {
 
         <div className="flex-1 ml-8">
           {/* Stats Overview */}
-          <div className="grid grid-cols-4 gap-4 mb-8">
+          <div className="flex  gap-4 mb-8">
             {stats.map((stat, index) => (
-              <div key={index} className="bg-white p-4 rounded-lg shadow">
-                <div className="flex justify-between items-center">
+              <div key={index} className="bg-white p-4 rounded-lg shadow ">
+                <div className="flex justify-between items-center gap-6">
                   <div>
                     <p className="text-gray-500 text-sm">{stat.title}</p>
                     <p className="text-2xl font-bold">{stat.value}</p>
                   </div>
-                  <div className={`p-2 rounded-full ${stat.trend === 'up' ? 'bg-green-100 text-green-600' : 'bg-red-100 text-red-600'}`}>
+                  <div className="p-2 rounded-full bg-green-100 text-green-600 ">
                     {stat.icon}
                   </div>
                 </div>
-                <p className={`text-xs mt-2 ${stat.trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-                  {stat.change} from last month
-                </p>
               </div>
             ))}
           </div>
@@ -225,8 +207,6 @@ export default function CreatorDashboard() {
                   students={course.students}
                   earnings={course.earnings}
                   rating={course.rating}
-                  isSelected={selectedCourse === course.id}
-                  onClick={() => setSelectedCourse(course.id)}
                 />
               ))}
             </div>

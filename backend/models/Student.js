@@ -7,6 +7,7 @@ const StudentSchema = new mongoose.Schema({
   password: { type: String, required: true },
   walletAddress: { type: String },
   coins: { type: Number, default: 0, min: 0 },
+  ownedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
   completedCourses: { 
     type: [{ 
       course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
@@ -15,7 +16,17 @@ const StudentSchema = new mongoose.Schema({
     }], 
     default: [] 
   },
-  ownedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
+  courseProgress: { 
+    type: [{ 
+      course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
+      syllabus: [{
+        S_no: Number,
+        title: String,
+        Status:  { type: String, enum: ['Pending', 'Completed'], default: 'Pending' },
+      }],
+    }], 
+    default: [] 
+  },
   rentedCourses: { 
     type: [{ 
       course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },

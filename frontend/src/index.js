@@ -31,8 +31,8 @@ root.render(
         <Route path="/CreatorCommunity" element={<CreatorCommunity />} />
         <Route path="/Profile" element={<Profile />} />
         <Route path="/CourseBuying/:id" element={<CourseBuying />} />
-        <Route path="/CourseExchange" element={<CourseExchange />} />
-        <Route path="/streamingcourse" element={<StreamingCourse />} />
+        <Route path="/CourseExchange/:id" element={<CourseExchange />} />
+        <Route path="/streamingcourse/:id" element={<StreamingCourse />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/signin" element={<Signin />} />
         <Route path="/transaction" element={<Transaction />} />

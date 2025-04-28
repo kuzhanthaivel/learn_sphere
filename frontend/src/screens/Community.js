@@ -8,7 +8,7 @@ import { RiCommunityLine } from "react-icons/ri";
 import { FaHome } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { VscVerifiedFilled } from "react-icons/vsc";
-
+import { useParams, useNavigate } from 'react-router-dom';
 // Sample messages for each community
 const communityMessages = {
   "Web Development": [
@@ -73,6 +73,9 @@ const CommunityChat = () => {
     { id: 5, name: "Music Theory", members: 98, image: CoverImage2 },
     { id: 6, name: "Photography", members: 203, image: CoverImage3 }
   ]);
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const studentToken = localStorage.getItem('studentToken');
 
   const messagesEndRef = useRef(null);
 
@@ -85,7 +88,7 @@ const CommunityChat = () => {
   }, [messages]);
 
   useEffect(() => {
-    // Load messages for the selected community
+
     setMessages(communityMessages[selectedCommunity] || []);
   }, [selectedCommunity]);
 
@@ -167,7 +170,7 @@ const CommunityChat = () => {
                     className={`rounded-lg p-4 max-w-xs md:max-w-md lg:max-w-lg ${
                       msg.isYou 
                         ? 'bg-[#111B21] text-gray-200' 
-                        : msg.sender === 'Instructor' || msg.sender === 'Professor' || msg.sender === 'Design Lead'
+                        : msg.sender === 'Creator' 
                           ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200' 
                           : 'bg-[#111B21] text-gray-200'
                     }`}

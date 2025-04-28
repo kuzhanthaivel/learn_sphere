@@ -114,7 +114,7 @@ export default function CourseBinding() {
     if (selectedDuration && courseData) {
       const durationData = durationOptions[selectedDuration];
       const moneyCost = (courseData.price * durationData.percentage) / 100;
-      const calculatedCoinsCost = Math.round((courseData.price * 10) * (durationData.coinsMultiplier / 100));
+      const calculatedCoinsCost = Math.round((courseData.price * durationData.coinsMultiplier) / 100);
       
       setRentalCost(moneyCost);
       setCoinsCost(calculatedCoinsCost);

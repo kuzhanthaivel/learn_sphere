@@ -4,7 +4,7 @@ const Course = require('../../models/Course');
 const express = require('express');
 const router = express.Router();
 
-router.get('/owned-courses', async (req, res) => {
+router.get('/', async (req, res) => {
     try {
         // Get and verify token
         const token = req.header('Authorization')?.replace('Bearer ', '');

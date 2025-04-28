@@ -199,25 +199,25 @@ export default function Page() {
           <div className='flex flex-col gap-2'>
             <div className='flex justify-evenly items-center '>
              <img src={Badges} alt="Learn Sphere" className='w-52' />
-             <img src={level1} alt="Learn Sphere" className='w-28 ' />
-             <img src={level2} alt="Learn Sphere" className='w-28 ' />
-             <img src={level3} alt="Learn Sphere" className='w-28 ' />
+             <img src={level1} alt="Learn Sphere" className='w-28 hover:scale-105' />
+             <img src={level2} alt="Learn Sphere" className='w-28 hover:scale-105' />
+             <img src={level3} alt="Learn Sphere" className='w-28 hover:scale-105' />
              </div>
            <div className='flex justify-evenly items-center'>
-             <img src={level4} alt="Learn Sphere" className='w-16 ' />
-             <img src={level5} alt="Learn Sphere" className='w-16 ' />
-             <img src={level6} alt="Learn Sphere" className='w-16 ' />
-             <img src={level7} alt="Learn Sphere" className='w-14 ' />
-             <img src={level8} alt="Learn Sphere" className='w-28 ' />
-             <img src={level9} alt="Learn Sphere" className='w-28 ' />
+             <img src={level4} alt="Learn Sphere" className='w-16 hover:scale-105' />
+             <img src={level5} alt="Learn Sphere" className='w-16 hover:scale-105' />
+             <img src={level6} alt="Learn Sphere" className='w-16 hover:scale-105' />
+             <img src={level7} alt="Learn Sphere" className='w-14 hover:scale-105' />
+             <img src={level8} alt="Learn Sphere" className='w-28 hover:scale-105' />
+             <img src={level9} alt="Learn Sphere" className='w-28 hover:scale-105' />
              </div>
             <div className='flex justify-evenly items-center'>
-             <img src={level10} alt="Learn Sphere" className='w-16  ' />
-             <img src={level11} alt="Learn Sphere" className='w-16  ' />
-             <img src={level12} alt="Learn Sphere" className='w-16  ' />
-             <img src={level13} alt="Learn Sphere" className='w-16  ' />
-             <img src={level14} alt="Learn Sphere" className='w-24  ' />
-             <img src={level15} alt="Learn Sphere" className='w-24  ' />
+             <img src={level10} alt="Learn Sphere" className='w-16 hover:scale-105 ' />
+             <img src={level11} alt="Learn Sphere" className='w-16 hover:scale-105 ' />
+             <img src={level12} alt="Learn Sphere" className='w-16 hover:scale-105 ' />
+             <img src={level13} alt="Learn Sphere" className='w-16 hover:scale-105 ' />
+             <img src={level14} alt="Learn Sphere" className='w-24 hover:scale-105 ' />
+             <img src={level15} alt="Learn Sphere" className='w-24 hover:scale-105 ' />
              </div>
           </div>
       </div>
