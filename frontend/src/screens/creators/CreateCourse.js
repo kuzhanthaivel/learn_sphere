@@ -51,12 +51,11 @@ const UploadCourseForm = () => {
   const handleFileUpload = (index, file) => {
     const updatedSyllabus = [...formData.syllabus];
     updatedSyllabus[index].videoFile = file;
-    updatedSyllabus[index].videoUrl = ""; // Clear URL if file is selected
+    updatedSyllabus[index].videoUrl = ""; 
     setFormData(prev => ({ ...prev, syllabus: updatedSyllabus }));
     
     setUploadMethod(prev => ({ ...prev, [index]: 'file' }));
-    
-    // Simulate upload progress
+
     setUploadProgress(prev => ({ ...prev, [index]: 0 }));
     const interval = setInterval(() => {
       setUploadProgress(prev => {
@@ -114,7 +113,6 @@ const handleFormSubmit = async (e) => {
 
     const formDataToSend = new FormData();
 
-    // Basic fields
     formDataToSend.append('title', formData.title);
     formDataToSend.append('shortDescription', formData.shortDescription);
     formDataToSend.append('fullDescription', formData.fullDescription);
@@ -124,12 +122,10 @@ const handleFormSubmit = async (e) => {
     formDataToSend.append('discount', formData.discount);
     formDataToSend.append('communityName', formData.communityName);
 
-    // Cover image
     if (formData.coverImage) {
       formDataToSend.append('coverImage', formData.coverImage);
     }
 
-    // Syllabus data
     formDataToSend.append('syllabus', JSON.stringify(
       formData.syllabus.map(item => ({
         title: item.title,
@@ -137,10 +133,9 @@ const handleFormSubmit = async (e) => {
       }))
     ));
 
-    // Video files - use the exact field name your server expects
     formData.syllabus.forEach((item, index) => {
       if (item.videoFile) {
-        formDataToSend.append('videos', item.videoFile); // or 'syllabusVideos' if that's what server expects
+        formDataToSend.append('videos', item.videoFile);
       }
     });
 
@@ -158,7 +153,6 @@ const handleFormSubmit = async (e) => {
     }
 
     setSubmitSuccess(true);
-    // Reset form...
   } catch (error) {
     setSubmitError(error.message);
   } finally {
@@ -180,7 +174,6 @@ const handleFormSubmit = async (e) => {
             </div>
             
             <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
-              {/* Display success/error messages */}
               {submitSuccess && (
                 <div className="p-4 bg-green-100 text-green-700 rounded-lg">
                   Course created successfully!
@@ -192,7 +185,6 @@ const handleFormSubmit = async (e) => {
                 </div>
               )}
 
-              {/* Title */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="col-span-2">
                   <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -211,7 +203,6 @@ const handleFormSubmit = async (e) => {
                 </div>
               </div>
 
-              {/* Descriptions */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -245,7 +236,6 @@ const handleFormSubmit = async (e) => {
                 </div>
               </div>
 
-              {/* Cover Image */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FiUpload className="mr-2 text-indigo-600" />
@@ -277,7 +267,6 @@ const handleFormSubmit = async (e) => {
                 </div>
               </div>
 
-              {/* Category, Price, Rating, Discount */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
@@ -352,7 +341,6 @@ const handleFormSubmit = async (e) => {
                 </div>
               </div>
 
-              {/* Syllabus */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FiList className="mr-2 text-indigo-600" />
@@ -379,8 +367,7 @@ const handleFormSubmit = async (e) => {
                             required
                           />
                         </div>
-                        
-                        {/* Video Input Section */}
+
                         <div className="mt-2 space-y-2">
                           <div className="flex items-center space-x-4 mb-2">
                             <button
@@ -469,7 +456,6 @@ const handleFormSubmit = async (e) => {
                 </div>
               </div>
 
-              {/* Community */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
                   <FiUsers className="mr-2 text-indigo-600" />
@@ -485,7 +471,6 @@ const handleFormSubmit = async (e) => {
                 />
               </div>
 
-              {/* Submit Button */}
               <div className="pt-4">
                 <button
                   type="submit"

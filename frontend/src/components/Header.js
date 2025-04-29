@@ -7,7 +7,7 @@ import defaultProfile from '../assets/defaultProfile.png';
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const [authStatus, setAuthStatus] = useState('loading'); // 'loading', 'loggedIn', 'loggedOut'
+  const [authStatus, setAuthStatus] = useState('loading'); 
   const [studentData, setStudentData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -72,7 +72,6 @@ const Navbar = () => {
     return `http://localhost:5001/uploads/${filename}`;
   };
 
-  // Loading state
   if (authStatus === 'loading') {
     return (
       <nav className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-300 rounded-lg md:px-20">
@@ -99,7 +98,6 @@ const Navbar = () => {
 
   return (
     <nav className="flex items-center justify-between px-4 py-3 bg-white border-b border-gray-300 rounded-lg md:px-20">
-      {/* Logo */}
 
       <div className="flex items-center space-x-2">
         <Link to="/">
@@ -121,7 +119,6 @@ const Navbar = () => {
         </svg>
       </button>
 
-      {/* Desktop Navigation */}
       {authStatus === 'loggedIn' && (
         <div className="hidden space-x-6 text-gray-700 md:flex">
           <NavLink to="/Home"       className={({ isActive }) => 
@@ -142,7 +139,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* Mobile Navigation */}
       {mobileMenuOpen && (
         <div className="absolute left-0 right-0 z-20 flex flex-col items-center py-4 mt-2 space-y-4 bg-white border-b border-gray-200 top-16 md:hidden">
           {authStatus === 'loggedIn' && (
@@ -170,7 +166,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* User Profile Section */}
       <div className="items-center hidden space-x-4 md:flex">
         {authStatus === 'loggedIn' ? (
           <div className="flex items-center space-x-4">

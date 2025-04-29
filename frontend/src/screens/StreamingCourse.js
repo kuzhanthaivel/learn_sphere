@@ -37,13 +37,10 @@ export default function StreamingCourse() {
 
       const data = await response.json();
       if (data.courseProgress && data.courseProgress.syllabus) {
-        // Extract the S_no of completed syllabus items
         const completedItems = data.courseProgress.syllabus
           .filter(item => item.Status === "Completed")
           .map(item => item.S_no);
         setChecked(completedItems);
-        
-        // Check if all items are completed
         const allCompleted = data.courseProgress.syllabus.every(item => item.Status === "Completed");
         setCourseCompleted(allCompleted);
       }
@@ -70,10 +67,8 @@ export default function StreamingCourse() {
         const data = await response.json();
         setCourseData(data);
         
-        // Fetch completed syllabus items after course data is loaded
         await fetchCompletedSyllabus();
-        
-        // Set the first video as default
+
         if (data.syllabus && data.syllabus.length > 0) {
           setCurrentVideo(data.syllabus[0]);
         }
@@ -99,7 +94,6 @@ export default function StreamingCourse() {
   }, [id, studentToken, navigate]);
 
   const handleToggle = async (item) => {
-    // Don't allow unchecking if already checked
     if (checked.includes(item.S_no)) {
       return;
     }
@@ -127,7 +121,6 @@ export default function StreamingCourse() {
       
       setChecked(prev => [...prev, item.S_no]);
 
-      // Check if all syllabus items are now completed
       if (courseData?.syllabus?.every(syllabusItem => 
         [...checked, item.S_no].includes(syllabusItem.S_no)
       )) {
@@ -266,7 +259,7 @@ export default function StreamingCourse() {
                   checked={checked.includes(item.S_no)}
                   onChange={() => handleToggle(item)}
                   id={`syllabus-${item.S_no}`}
-                  disabled={checked.includes(item.S_no)} // Disable if already checked
+                  disabled={checked.includes(item.S_no)}
                 />
                 <label 
                   htmlFor={`syllabus-${item.S_no}`} 

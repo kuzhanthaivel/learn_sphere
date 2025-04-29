@@ -17,8 +17,6 @@ function generatePermanentCode(studentId, courseId) {
 
 
 router.post('/', async (req, res) => {
-  console.log('\n--- New Course Purchase Request ---');
-  console.log('Request Body:', req.body);
   
   const session = await mongoose.startSession();
   session.startTransaction();
@@ -99,7 +97,7 @@ router.post('/', async (req, res) => {
       user: studentId,
       course: courseId,
       code: generatePermanentCode(studentId, courseId),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) // 30 days
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
     });
 
     const transaction = new Transaction({

@@ -69,8 +69,7 @@ const SignUp = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitError('');
-  
-    // Validate passwords match
+
     if (formData.password !== formData.verifyPassword) {
       setSubmitError("Passwords don't match!");
       return;
@@ -78,8 +77,7 @@ const SignUp = () => {
   
     try {
       setIsSubmitting(true);
-  
-      // Create FormData object
+
       const formDataToSend = new FormData();
       formDataToSend.append('email', formData.email);
       formDataToSend.append('password', formData.password);
@@ -93,8 +91,7 @@ const SignUp = () => {
       formDataToSend.append('linkedin', formData.linkedin);
       formDataToSend.append('twitter', formData.twitter);
       formDataToSend.append('portfolio', formData.portfolio);
-  
-      // Make API request
+
       const response = await fetch('http://localhost:5001/api/students/signup', {
         method: 'POST',
         body: formDataToSend,
@@ -135,7 +132,6 @@ const SignUp = () => {
 
             <form className="space-y-4" onSubmit={handleSubmit}>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* Username */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Username*</label>
                   <input
@@ -149,7 +145,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* Email */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Email*</label>
                   <input
@@ -163,7 +158,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* Password */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Password*</label>
                   <input
@@ -178,7 +172,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* Verify Password */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Verify Password*</label>
                   <input
@@ -192,7 +185,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* Wallet Address */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Wallet Address</label>
                   <div className="flex gap-2">
@@ -219,7 +211,6 @@ const SignUp = () => {
                   )}
                 </div>
 
-                {/* Profile Image */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Profile Image</label>
                   <input
@@ -232,7 +223,6 @@ const SignUp = () => {
                 </div>
               </div>
 
-              {/* Bio */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700">Bio</label>
                 <textarea
@@ -246,7 +236,6 @@ const SignUp = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {/* GitHub */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">GitHub</label>
                   <input
@@ -259,7 +248,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* LinkedIn */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">LinkedIn</label>
                   <input
@@ -272,7 +260,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* Twitter */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Twitter</label>
                   <input
@@ -285,7 +272,6 @@ const SignUp = () => {
                   />
                 </div>
 
-                {/* Portfolio */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-gray-700">Portfolio</label>
                   <input
@@ -299,7 +285,6 @@ const SignUp = () => {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isSubmitting}
@@ -315,7 +300,6 @@ const SignUp = () => {
               <div className="flex-grow border-t border-gray-300"></div>
             </div>
 
-            {/* Footer */}
             <div className="text-center text-sm text-gray-600">
               Already have an account?{" "}
               <a href="/signin" className="font-semibold text-[#FF7F00] hover:underline transition-colors">

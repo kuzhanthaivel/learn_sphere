@@ -177,7 +177,6 @@ export default function CreatorSignup() {
               
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  {/* Left Column */}
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Professional Name*</label>
@@ -276,7 +275,6 @@ export default function CreatorSignup() {
                     </div>
                   </div>
 
-                  {/* Right Column */}
                   <div className="space-y-4">
                     <div>
                       <label className="block text-sm font-medium text-gray-700 mb-1">Profile Image</label>

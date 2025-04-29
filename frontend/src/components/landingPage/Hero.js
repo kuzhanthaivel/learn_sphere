@@ -18,7 +18,6 @@ const HeroSection = () => {
         </button>
       </div>
 
-      {/* Right Side - Course Cards */}
       <div className="relative flex mt-10 space-x-6 lg:mt-0">
           <img src={Heroimage} alt="Learn Sphere" className="w-[600px] " />
       </div>

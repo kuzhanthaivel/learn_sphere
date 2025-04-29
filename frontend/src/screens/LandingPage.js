@@ -7,7 +7,6 @@ import RegisterNow from "../components/landingPage/registerNow";
 
 import React from "react";
 
-// eslint-disable-next-line import/no-anonymous-default-export
 export default function landingPage( ) {
     return (
         <div>

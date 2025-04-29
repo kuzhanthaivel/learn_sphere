@@ -235,7 +235,6 @@ export default function CourseBinding() {
         </div>
       </div>
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-6 pb-6 ">
-        {/* Left Side - Course Description & Syllabus */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
             <p className="text-xs text-gray-500 font-semibold mb-2">
@@ -264,7 +263,6 @@ export default function CourseBinding() {
           </div>
         </div>
 
-        {/* Right Side - Payment Options */}
         <div className="bg-white p-6 rounded-lg shadow-md w-auto lg:w-80 lg:h-auto">
           <img
             src={imageUrl}

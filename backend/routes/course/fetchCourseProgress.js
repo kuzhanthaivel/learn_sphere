@@ -32,7 +32,6 @@ router.put('/', async (req, res) => {
       });
     }
 
-    // Find the course progress for the specified course ID
     const courseProgress = student.courseProgress.find(progress => 
       progress.course.toString() === courseId
     );

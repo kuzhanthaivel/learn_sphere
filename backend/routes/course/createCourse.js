@@ -18,7 +18,6 @@ const coverImageStorage = multer.diskStorage({
   },
 });
 
-// Configure storage for video files
 const videoStorage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads/course-videos/');
@@ -29,7 +28,6 @@ const videoStorage = multer.diskStorage({
   },
 });
 
-// File filters
 const imageFilter = (req, file, cb) => {
   if (file.mimetype.startsWith('image/')) {
     cb(null, true);
@@ -46,20 +44,18 @@ const videoFilter = (req, file, cb) => {
   }
 };
 
-// Upload middlewares
 const uploadCoverImage = multer({
   storage: coverImageStorage,
-  limits: { fileSize: 1024 * 1024 * 10 }, // 10MB limit
+  limits: { fileSize: 1024 * 1024 * 10 },
   fileFilter: imageFilter,
 }).single('coverImage');
 
 const uploadVideo = multer({
   storage: videoStorage,
-  limits: { fileSize: 1024 * 1024 * 100 }, // 100MB limit
+  limits: { fileSize: 1024 * 1024 * 100 }, 
   fileFilter: videoFilter,
-}).array('syllabusVideos', 10); // Max 10 videos at once
+}).array('syllabusVideos', 10); 
 
-// Helper function to verify creator token
 const verifyCreatorToken = (token) => {
   try {
     return jwt.verify(token, process.env.JWT_SECRET);
@@ -68,9 +64,8 @@ const verifyCreatorToken = (token) => {
   }
 };
 
-// Create Course API
 router.post('/', async (req, res) => {
-  // First handle cover image upload
+
   uploadCoverImage(req, res, async (err) => {
     if (err) {
       return res.status(400).json({ 
@@ -79,7 +74,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Verify creator token
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
       return res.status(401).json({ 
@@ -96,7 +90,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Check if creator exists
     const creator = await Creator.findById(decoded.id);
     if (!creator) {
       return res.status(404).json({ 
@@ -105,7 +98,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Extract course data from request body
     const { 
       title,
       shortDescription,
@@ -118,7 +110,6 @@ router.post('/', async (req, res) => {
       communityName
     } = req.body;
 
-    // Validate required fields
     if (!title || !shortDescription || !fullDescription || !category || !price) {
       return res.status(400).json({ 
         success: false,
@@ -126,7 +117,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Parse syllabus if it's a string
     let syllabusArray;
     try {
       syllabusArray = Array.isArray(syllabus) ? syllabus : JSON.parse(syllabus || '[]');
@@ -137,7 +127,6 @@ router.post('/', async (req, res) => {
       });
     }
 
-    // Validate syllabus items
     if (!syllabusArray.length) {
       return res.status(400).json({ 
         success: false,
@@ -154,7 +143,6 @@ router.post('/', async (req, res) => {
       }
     }
 
-    // Handle video file uploads if any
     const processVideoUploads = async () => {
       return new Promise((resolve, reject) => {
         uploadVideo(req, res, async (err) => {
@@ -163,11 +151,9 @@ router.post('/', async (req, res) => {
             return;
           }
 
-          // Map uploaded files to syllabus items
           const files = req.files || [];
           const videoFileMap = {};
 
-          // Create a map of field names to file paths
           files.forEach(file => {
             const match = file.fieldname.match(/syllabusVideos\[(\d+)\]/);
             if (match) {
@@ -176,7 +162,6 @@ router.post('/', async (req, res) => {
             }
           });
 
-          // Update syllabus items with video file paths
           const processedSyllabus = syllabusArray.map((item, index) => {
             if (item.videoFile && videoFileMap[index] !== undefined) {
               return {
@@ -194,10 +179,8 @@ router.post('/', async (req, res) => {
     };
 
     try {
-      // Process video uploads if any
       const processedSyllabus = await processVideoUploads();
 
-      // First create the community
       const community = new Community({
         name: communityName || `${title} Community`,
         description: `Community for ${title} course`,
@@ -212,11 +195,9 @@ router.post('/', async (req, res) => {
 
       const savedCommunity = await community.save();
 
-      // Add community to creator's communities array
       creator.communities.push(savedCommunity._id);
       await creator.save();
 
-      // Now create the course with community reference
       const course = new Course({
         title,
         shortDescription,
@@ -238,7 +219,6 @@ router.post('/', async (req, res) => {
 
       const savedCourse = await course.save();
 
-      // Update creator's created courses
       creator.createdCourses.push(savedCourse._id);
       await creator.save();
 

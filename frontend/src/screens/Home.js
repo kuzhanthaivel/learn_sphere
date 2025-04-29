@@ -57,18 +57,15 @@ const Home = () => {
     { title: "Teaching", icon: PiDetectiveLight },
   ];
 
-  // Filter courses by selected category
   const filteredCourses = courses.filter(course => 
     selectedCategory === "All" || course.category === selectedCategory
   );
 
-  // Get current courses for pagination
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = filteredCourses.slice(indexOfFirstCourse, indexOfLastCourse);
   const totalPages = Math.ceil(filteredCourses.length / coursesPerPage);
 
-  // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   const CourseCard = ({ 
@@ -80,10 +77,9 @@ const Home = () => {
     price,
     rating
   }) => {
-    // Construct the full image URL for uploaded images
     const imageUrl = coverImage 
       ? `http://localhost:5001/${coverImage.replace(/\\/g, '/')}`
-      : CoverImage1; // Fallback to default image if none uploaded
+      : CoverImage1; 
     
     return (
       <div
@@ -214,8 +210,7 @@ const Home = () => {
                       />
                     ))}
                   </div>
-      
-                  {/* Pagination controls */}
+
                   {filteredCourses.length > coursesPerPage && (
                     <div className="flex justify-center mt-8">
                       <nav className="inline-flex rounded-md shadow">

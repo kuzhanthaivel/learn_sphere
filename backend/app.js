@@ -17,7 +17,11 @@ const StreamCourse = require('./routes/course/StreamCourse');
 const updateProgress = require('./routes/course/updateProgress'); 
 const fetchCourseProgress = require('./routes/course/fetchCourseProgress'); 
 const fetchExchangeCode = require('./routes/transaction/fetchExchangeCode'); 
+const fetchAllCommunity = require('./routes/community/fetchAllCommunity'); 
+const addMessage = require('./routes/community/addMessage'); 
+const fetchMessage = require('./routes/community/fetchMessage'); 
 const Buy = require('./routes/transaction/buy'); 
+const creatorDashboard = require('./routes/creator/dashboard'); 
 const moment = require("moment");
 dotenv.config();
 
@@ -54,6 +58,10 @@ app.use('/api/StreamCourse', StreamCourse);
 app.use('/api/student/update-progress', updateProgress);
 app.use('/api/student/fetchCourseProgress', fetchCourseProgress);
 app.use('/api/student/fetchMYExchangeCode', fetchExchangeCode);
+app.use('/api/user/communities', fetchAllCommunity);
+app.use('/api/communities/addMessage', addMessage);
+app.use('/api/communities/fetchMessage', fetchMessage);
+app.use('/api/creator/dashboard', creatorDashboard);
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

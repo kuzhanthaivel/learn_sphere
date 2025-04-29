@@ -14,6 +14,7 @@ import Dashboard from './screens/dashboard';
 import Community from './screens/Community';
 import CreatorCommunity from './screens/creators/creatorCommunity';
 import Profile from './screens/profile';
+import SharableProfile from './screens/sharableProfile';
 import Home from './screens/Home'
 import CretorSignup from './screens/creators/cretorSignup'
 import CreatorSignin from './screens/creators/creatorSignin'
@@ -30,6 +31,7 @@ root.render(
         <Route path="/Community" element={<Community />} />
         <Route path="/CreatorCommunity" element={<CreatorCommunity />} />
         <Route path="/Profile" element={<Profile />} />
+        <Route path="/sharableProfile" element={<SharableProfile />} />
         <Route path="/CourseBuying/:id" element={<CourseBuying />} />
         <Route path="/CourseExchange/:id" element={<CourseExchange />} />
         <Route path="/streamingcourse/:id" element={<StreamingCourse />} />

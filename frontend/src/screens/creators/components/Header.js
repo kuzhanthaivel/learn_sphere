@@ -91,14 +91,12 @@ const Navbar = () => {
 
   return (
     <nav className="flex items-center justify-between px-20 py-3 bg-white border border-b-gray-300 rounded-lg">
-      {/* Logo */}
       <div className="flex items-center space-x-2">
         <Link to="/">
           <img src={learnSphere} alt="Learn Sphere" width={120} height={40} />
         </Link>
       </div>
 
-      {/* Navigation Links */}
       {authStatus === 'loggedIn' && (
         <div className="hidden space-x-6 text-gray-700 md:flex">
           <NavLink to="/CreateCourse"      className={({ isActive }) => 
@@ -113,7 +111,6 @@ const Navbar = () => {
         </div>
       )}
 
-      {/* User Actions */}
       <div className="flex items-center space-x-4">
         {authStatus === 'loggedIn' ? (
           <div className="flex items-center space-x-4">

@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        // Get and verify token
         const token = req.header('Authorization')?.replace('Bearer ', '');
         
         if (!token) {
@@ -27,13 +26,12 @@ router.get('/', async (req, res) => {
             return res.status(404).json({ error: 'Student not found' });
         }
 
-        // Format the response
         const ownedCourses = student.ownedCourses.map(course => ({
             id: course._id,
             title: course.title,
             shortDescription: course.shortDescription,
             category: course.category,
-            community: course.community, // This will be the ObjectId
+            community: course.community, 
             coverImage: course.coverImage
         }));
 

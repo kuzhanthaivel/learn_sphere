@@ -1,78 +1,23 @@
 import React, { useState, useRef, useEffect } from "react";
-import CoverImage1 from "../../assets/CoverImage1.png";
-import CoverImage2 from "../../assets/CoverImage2.png";
-import CoverImage3 from "../../assets/CoverImage3.png";
 import chatbg from "../../assets/chatbg.png";
 import learnSphere from '../../assets/learnSphere.png'
 import { RiCommunityLine } from "react-icons/ri";
 import { FaHome } from "react-icons/fa";
 import { IoSettingsOutline } from "react-icons/io5";
 import { VscVerifiedFilled } from "react-icons/vsc";
-
-// Sample messages for each community
-const communityMessages = {
-  "Web Development": [
-    {
-      id: 1,
-      sender: "Instructor",
-      content: "Welcome to the Web Development community! Today we'll discuss React hooks.",
-      time: "10:00",
-      isYou: false
-    },
-    {
-      id: 2,
-      sender: "Student: Alex",
-      content: "I'm having trouble with useEffect dependencies. Any tips?",
-      time: "10:05",
-      isYou: false
-    }
-  ],
-  "UI/UX Design": [
-    {
-      id: 1,
-      sender: "Design Lead",
-      content: "Let's review some Figma prototypes for the new app design.",
-      time: "14:30",
-      isYou: false
-    },
-    {
-      id: 2,
-      sender: "Student: Maria",
-      content: "I've shared my prototype for feedback on the user flow.",
-      time: "14:35",
-      isYou: false
-    }
-  ],
-  "Data Science": [
-    {
-      id: 1,
-      sender: "Professor",
-      content: "Today we'll analyze the COVID dataset using Pandas.",
-      time: "09:00",
-      isYou: false
-    },
-    {
-      id: 2,
-      sender: "TA: John",
-      content: "Remember to preprocess your data before running models.",
-      time: "09:10",
-      isYou: false
-    }
-  ]
-};
+import { useParams, useNavigate } from 'react-router-dom';
 
 const CommunityChat = () => {
   const [message, setMessage] = useState("");
-  const [selectedCommunity, setSelectedCommunity] = useState("Web Development");
-  const [messages, setMessages] = useState(communityMessages["Web Development"]);
-  const [communities] = useState([
-    { id: 1, name: "Web Development", members: 245, image: CoverImage1 },
-    { id: 2, name: "UI/UX Design", members: 189, image: CoverImage2 },
-    { id: 3, name: "Data Science", members: 312, image: CoverImage3 },
-    { id: 4, name: "Digital Marketing", members: 156, image: CoverImage1 },
-    { id: 5, name: "Music Theory", members: 98, image: CoverImage2 },
-    { id: 6, name: "Photography", members: 203, image: CoverImage3 }
-  ]);
+  const [selectedCommunity, setSelectedCommunity] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [communities, setCommunities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [isSending, setIsSending] = useState(false);
+  const [fetchingMessages, setFetchingMessages] = useState(false);
+  const navigate = useNavigate();
+  const creatorToken = localStorage.getItem('creatorToken');
 
   const messagesEndRef = useRef(null);
 
@@ -85,38 +30,210 @@ const CommunityChat = () => {
   }, [messages]);
 
   useEffect(() => {
-    // Load messages for the selected community
-    setMessages(communityMessages[selectedCommunity] || []);
-  }, [selectedCommunity]);
+    const fetchCommunities = async () => {
+      try {
+        const response = await fetch('http://localhost:5001/api/user/communities', {
+          headers: {
+            'Authorization': `Bearer ${creatorToken}`
+          }
+        });
+        
+        if (!response.ok) {
+          throw new Error('Failed to fetch communities');
+        }
+        
+        const data = await response.json();
+        
+        if (data.success && data.communities.length > 0) {
+          setCommunities(data.communities);
+          if (data.communities.length > 0) {
+            handleCommunitySelect(data.communities[0]);
+          }
+        }
+      } catch (err) {
+        console.error('Error fetching communities:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleSendMessage = () => {
-    if (message.trim() === "") return;
+    if (creatorToken) {
+      fetchCommunities();
+    } else {
+      setError('No authentication token found');
+      setLoading(false);
+      navigate('/CreatorSignin');
+    }
+  }, [creatorToken, navigate]);
+
+  const fetchCommunityMessages = async (communityId) => {
+    if (!communityId) return;
     
-    const newMessage = {
-      id: messages.length + 1,
+    setFetchingMessages(true);
+    setError(null);
+    
+    try {
+      const response = await fetch('http://localhost:5001/api/communities/fetchMessage', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${creatorToken}`
+        },
+        body: JSON.stringify({ communityId })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to fetch messages');
+      }
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        setMessages(formatMessages(data.messages));
+      }
+    } catch (err) {
+      console.error('Error fetching messages:', err);
+      setError(err.message);
+    } finally {
+      setFetchingMessages(false);
+    }
+  };
+
+  const formatMessages = (apiMessages) => {
+    if (!apiMessages) return [];
+    
+    return apiMessages.map(msg => ({
+      id: msg._id,
+      sender: msg.isYou ? "You" : msg.userName,
+      content: msg.content,
+      time: new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      isYou: msg.isYou,
+      userType: msg.userType
+    }));
+  };
+
+  const handleSendMessage = async () => {
+    if (message.trim() === "" || !selectedCommunity) return;
+    if (message.length > 500) {
+      setError('Message too long (max 500 characters)');
+      return;
+    }
+    
+    setIsSending(true);
+    setError(null);
+    
+    const tempMessage = {
+      id: `temp-${Date.now()}`,
       sender: "You",
       content: message,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      isYou: true
+      isYou: true,
+      userType: "Student" // Assuming current user is always student in this context
     };
     
-    setMessages([...messages, newMessage]);
+    setMessages(prev => [...prev, tempMessage]);
     setMessage("");
+    
+    try {
+      const response = await fetch(`http://localhost:5001/api/communities/addMessage`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${creatorToken}`
+        },
+        body: JSON.stringify({ 
+          communityId: selectedCommunity._id, 
+          content: message 
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error(response.status === 401 ? 'Unauthorized' : 'Failed to send message');
+      }
+      
+      const data = await response.json();
+      
+      if (data.newMessage) {
+        setMessages(prev => [
+          ...prev.filter(m => m.id !== tempMessage.id),
+          {
+            id: data.newMessage._id || tempMessage.id,
+            sender: "You",
+            content: data.newMessage.content,
+            time: new Date(data.newMessage.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+            isYou: true,
+            userType: data.newMessage.userType
+          }
+        ]);
+      }
+    } catch (err) {
+      console.error('Error sending message:', err);
+      setMessages(prev => prev.filter(m => m.id !== tempMessage.id));
+      setError(err.message === 'Unauthorized' ? 'Please login again' : 'Failed to send message');
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && !isSending) {
       handleSendMessage();
     }
   };
 
-  const handleCommunitySelect = (communityName) => {
-    setSelectedCommunity(communityName);
+  const handleCommunitySelect = (community) => {
+    setSelectedCommunity(community);
+    fetchCommunityMessages(community._id);
+    setError(null);
   };
+
+  if (loading) {
+    return (
+      <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto mb-4"></div>
+          <p>Loading communities...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !communities.length) {
+    return (
+      <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
+        <div className="text-center text-red-500">
+          <p>Error: {error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (communities.length === 0) {
+    return (
+      <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
+        <div className="text-center">
+          <p>You haven't joined any communities yet.</p>
+          <button 
+            onClick={() => navigate('/CreaorDashboard')}
+            className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
+          >
+            Explore Communities
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-h-screen min-h-screen flex bg-gray-900 text-white">
-      {/* Sidebar */}
+
       <aside className="w-16 bg-gray-800 flex flex-col items-center py-4 space-y-6">
         <button className="text-green-500 text-xl hover:bg-gray-700 p-2 rounded-lg transition">
             <RiCommunityLine/>    
@@ -129,25 +246,29 @@ const CommunityChat = () => {
         </button>
       </aside>
 
-      {/* Main Content */}
       <div className="flex-grow flex flex-col">
-        {/* Header */}
         <header className="bg-gray-800 px-6 py-4 flex justify-center items-center space-x-2 border-b border-gray-700">
           <div className="flex items-center space-x-2">
             <img src={learnSphere} alt="Learn Sphere" className="w-40" />
           </div>
-          <div>
-            <div className="flex justify-start items-center gap-1">
-              <h2 className="text-sm">Community</h2>
-              <VscVerifiedFilled className="text-sky-700"/>
+          {selectedCommunity && (
+            <div>
+              <div className="flex justify-start items-center gap-1">
+                <h2 className="text-sm">Community</h2>
+                <VscVerifiedFilled className="text-sky-700"/>
+              </div>
+              <h2 className="text-sm text-gray-400">{selectedCommunity.name}</h2>
             </div>
-            <h2 className="text-sm text-gray-400">{selectedCommunity}</h2>
-          </div>
+          )}
         </header>
 
-        {/* Chat Section */}
+        {error && (
+          <div className="bg-red-900 text-white p-2 text-center text-sm">
+            {error}
+          </div>
+        )}
+
         <div className="flex flex-grow overflow-hidden">
-          {/* Chat Messages */}
           <div 
             className="flex-grow bg-[#20262a] bg-cover bg-center p-6 overflow-y-auto"
             style={{ 
@@ -157,52 +278,69 @@ const CommunityChat = () => {
               msOverflowStyle: 'none'
             }}
           >
-            <div className="space-y-4 [&::-webkit-scrollbar]:hidden">
-              {messages.map((msg) => (
-                <div 
-                  key={msg.id} 
-                  className={`flex flex-col ${msg.isYou ? 'items-end' : 'items-start'}`}
-                >
+            {fetchingMessages ? (
+              <div className="flex justify-center items-center h-full">
+                <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
+              </div>
+            ) : (
+              <div className="space-y-4 [&::-webkit-scrollbar]:hidden">
+                {messages.map((msg) => (
                   <div 
-                    className={`rounded-lg p-4 max-w-xs md:max-w-md lg:max-w-lg ${
-                      msg.isYou 
-                        ? 'bg-[#111B21] text-gray-200' 
-                        : msg.sender === 'Instructor' || msg.sender === 'Professor' || msg.sender === 'Design Lead'
-                          ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200' 
-                          : 'bg-[#111B21] text-gray-200'
-                    }`}
+                    key={msg.id} 
+                    className={`flex flex-col ${msg.isYou ? 'items-end' : 'items-start'}`}
                   >
-                    <span className="font-semibold text-violet-500">{msg.sender}</span>
-                    <p className="mt-1 text-sm">{msg.content}</p>
+                    <div 
+                      className={`rounded-lg p-4 max-w-xs md:max-w-md lg:max-w-lg ${
+                        msg.isYou 
+                          ? 'bg-[#111B21] text-gray-200' 
+                          : msg.userType === 'Creator' 
+                            ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200' 
+                            : 'bg-[#111B21] text-gray-200'
+                      }`}
+                    >
+                      <span className={`font-semibold ${
+                        msg.userType === 'Creator' ? 'text-green-500' : 'text-violet-500'
+                      }`}>
+                        {msg.sender}
+                        {msg.userType === 'Creator' && <VscVerifiedFilled className="inline ml-1 text-green-500" />}
+                      </span>
+                      <p className="mt-1 text-sm">{msg.content}</p>
+                    </div>
+                    <span className="text-sm text-gray-400 mt-1">{msg.time}</span>
                   </div>
-                  <span className="text-sm text-gray-400 mt-1">{msg.time}</span>
-                </div>
-              ))}
-              <div ref={messagesEndRef} />
-            </div>
+                ))}
+                <div ref={messagesEndRef} />
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Message Input */}
         <div className="bg-gray-800 p-4 flex items-center border-t border-gray-700">
           <input
             type="text"
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              setError(null);
+            }}
             onKeyPress={handleKeyPress}
-            placeholder={`Message ${selectedCommunity} community...`}
+            placeholder={selectedCommunity ? `Message ${selectedCommunity.name} community...` : "Select a community..."}
             className="flex-grow bg-gray-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition"
+            disabled={!selectedCommunity || isSending || fetchingMessages}
+            maxLength={500}
           />
           <button 
             onClick={handleSendMessage}
-            className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg ml-4 transition"
+            disabled={!selectedCommunity || isSending || message.trim() === "" || fetchingMessages}
+            className={`bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg ml-4 transition ${
+              (!selectedCommunity || isSending || message.trim() === "" || fetchingMessages) ? 'opacity-50 cursor-not-allowed' : ''
+            }`}
           >
-            Send
+            {isSending ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>
-      
-      {/* Communities Sidebar */}
+
       <aside 
         className="w-96 bg-gray-800 p-6 overflow-y-auto border-l border-gray-700 flex-col items-center"
         style={{ 
@@ -216,20 +354,18 @@ const CommunityChat = () => {
         <ul className="space-y-3 [&::-webkit-scrollbar]:hidden">
           {communities.map((community) => (
             <li
-              key={community.id}
-              onClick={() => handleCommunitySelect(community.name)}
+              key={community._id}
+              onClick={() => handleCommunitySelect(community)}
               className={`flex items-center space-x-3 p-2 rounded-lg hover:ring-2 hover:ring-green-500 transition cursor-pointer ${
-                selectedCommunity === community.name ? 'bg-gray-600' : 'bg-gray-700'
+                selectedCommunity && selectedCommunity._id === community._id ? 'bg-gray-600' : 'bg-gray-700'
               }`}
             >
-              <img
-                src={community.image}
-                alt={community.name}
-                className="w-auto h-10 rounded-lg object-cover"
-              />
+              <div className="w-10 h-10 rounded-lg bg-gray-600 flex items-center justify-center">
+                <span className="text-lg">{community.name.charAt(0).toUpperCase()}</span>
+              </div>
               <div>
                 <h4 className="text-sm font-medium line-clamp-1">{community.name}</h4>
-                <p className="text-xs text-gray-400">{community.members} members</p>
+                <p className="text-xs text-gray-400">{community.memberCount} members</p>
               </div>
             </li>
           ))}

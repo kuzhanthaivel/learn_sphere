@@ -6,7 +6,6 @@ const Footer = () => {
   return (
     <footer className="bg-blue-50 py-10 px-6 md:px-20 lg:px-32">
       <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-        {/* Logo & Contact */}
         <div>
          <img src={learnSphere} alt="Learn Sphere" width={120} height={40} />
           <h3 className="font-semibold mt-3">Contact Us</h3>
@@ -22,7 +21,6 @@ const Footer = () => {
          </div>
         </div>
         
-        {/* Explore */}
         <div>
           <h3 className="font-semibold">Explore</h3>
           <ul className="text-gray-600 text-sm space-y-2 mt-3">
@@ -35,7 +33,6 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Category */}
         <div>
           <h3 className="font-semibold">Category</h3>
           <ul className="text-gray-600 text-sm space-y-2 mt-3">
@@ -49,7 +46,6 @@ const Footer = () => {
           </ul>
         </div>
 
-        {/* Subscribe */}
         <div>
           <h3 className="font-semibold">Subscribe</h3>
           <p className="text-gray-600 text-sm mt-3">Join our mailing list to receive updates, course notifications, and exclusive insights right in your inbox.</p>

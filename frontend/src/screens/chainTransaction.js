@@ -2,7 +2,6 @@ import Navbar from "../components/Header";
 import Footer from "../components/footer";
 import { MdArrowBackIos } from "react-icons/md";
 
-// Your courses data
 const courses = [
   { 
     id: 1,
@@ -47,24 +46,23 @@ const courses = [
 ];
 
 export default function ChainTransaction() {
-  // Sample transaction data incorporating courses
   const data = [
     {
       id: 1,
       walletAddress: "0x71C7...3d4f",
       transactionDate: "2023-05-15 14:32",
-      courseId: 3, // Web Development Bootcamp
+      courseId: 3, 
       transactionType: "Buy",
       paymentMethod: "Token",
       amount: "50 EDU",
       transactionIdChain: "0x9a2b...7c1e",
-      exchange: null // No exchange used
+      exchange: null
     },
     {
       id: 2,
       walletAddress: "0x71C7...3d4f",
       transactionDate: "2023-05-18 09:15",
-      courseId: 2, // UI/UX Design Fundamentals
+      courseId: 2,
       transactionType: "Buy",
       paymentMethod: "Fiat",
       amount: "$99.00",
@@ -76,8 +74,8 @@ export default function ChainTransaction() {
       walletAddress: "0x71C7...3d4f",
       counterpartyWallet: "0x89AB...1e2f",
       transactionDate: "2023-05-20 16:48",
-      courseId: 5, // Digital Marketing Masterclass (user's course)
-      counterpartyCourseId: 1, // Introduction to Music Theory (other user's course)
+      courseId: 5, 
+      counterpartyCourseId: 1,
       transactionType: "Exchange",
       paymentMethod: "None",
       amount: "Free",
@@ -91,7 +89,7 @@ export default function ChainTransaction() {
       id: 4,
       walletAddress: "0x71C7...3d4f",
       transactionDate: "2023-05-22 11:05",
-      courseId: 8, // Mobile App Development
+      courseId: 8, 
       transactionType: "Rent",
       paymentMethod: "Token",
       amount: "15 EDU",
@@ -103,8 +101,8 @@ export default function ChainTransaction() {
       walletAddress: "0x71C7...3d4f",
       counterpartyWallet: "0x34CD...5f6g",
       transactionDate: "2023-05-25 13:27",
-      courseId: 1, // Introduction to Music Theory (user's course)
-      counterpartyCourseId: 4, // Advanced Photography (other user's course)
+      courseId: 1, 
+      counterpartyCourseId: 4,
       transactionType: "Exchange",
       paymentMethod: "None",
       amount: "Free",
@@ -118,7 +116,7 @@ export default function ChainTransaction() {
       id: 6,
       walletAddress: "0x71C7...3d4f",
       transactionDate: "2023-05-28 18:33",
-      courseId: 7, // Python for Data Science
+      courseId: 7, 
       transactionType: "Buy",
       paymentMethod: "Token",
       amount: "30 EDU",
@@ -129,7 +127,7 @@ export default function ChainTransaction() {
       id: 7,
       walletAddress: "0x71C7...3d4f",
       transactionDate: "2023-05-30 10:12",
-      courseId: 4, // Advanced Photography
+      courseId: 4, 
       transactionType: "Rent",
       paymentMethod: "Token",
       amount: "10 EDU",
@@ -138,12 +136,10 @@ export default function ChainTransaction() {
     }
   ];
 
-  // Function to get course details by ID
   const getCourseDetails = (id) => {
     return courses.find(course => course.id === id) || { title: "Unknown Course", category: "Unknown" };
   };
 
-  // Function to determine row color based on transaction type
   const getRowColor = (type) => {
     switch (type) {
       case "Buy":
@@ -157,7 +153,6 @@ export default function ChainTransaction() {
     }
   };
 
-  // Function to determine amount color
   const getAmountColor = (type) => {
     switch (type) {
       case "Buy":

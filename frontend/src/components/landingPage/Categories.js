@@ -27,15 +27,12 @@ const CategoriesSection = () => {
 
   return (
     <section className="py-16 px-60 bg-white">
-      {/* Image Section */}
       <div className="flex flex-col ">
         <img src={Categoriesimg} className="w-96" />
         <p className="text-gray-400 text-base mt-2">
           Various versions have evolved over the years, sometimes by accident.
         </p>
       </div>
-
-      {/* Categories Section */}
       <div className="mt-14">
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
           {categories.map((category, index) => {

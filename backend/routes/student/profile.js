@@ -21,7 +21,6 @@ router.get('/', async (req, res) => {
             return res.status(404).json({ error: 'Student not found' });
         }
 
-
         res.json({
 
         });

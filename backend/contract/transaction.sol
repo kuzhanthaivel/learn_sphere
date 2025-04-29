@@ -14,12 +14,12 @@ contract Transactions {
         uint256 courseId;
         TransactionType transactionType;
         uint256 amount;
-        string rentalDuration; // Only for Rent transactions
-        ExchangeData exchangeData; // Only for Exchange transactions
+        string rentalDuration;
+        ExchangeData exchangeData; 
         uint256 timestamp;
     }
 
-    mapping(uint256 => Transaction) public transactions; // Transaction ID => Transaction
+    mapping(uint256 => Transaction) public transactions; 
     uint256 public transactionCounter;
 
     event TransactionCreated(

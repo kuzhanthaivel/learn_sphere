@@ -1,11 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { BsArrowUpRightSquareFill } from "react-icons/bs";
-import { FaStar, FaUsers as FaCommunity } from "react-icons/fa";
+import { FaUsers as FaCommunity } from "react-icons/fa";
 import Header from "../components/Header";
 import Footer from "../components/footer";
 import CoverImage1 from "../assets/CoverImage1.png";
-import CoverImage2 from "../assets/CoverImage2.png";
-import CoverImage3 from "../assets/CoverImage3.png";
 import Mycourse from '../assets/MyCourse.png'
 import { useNavigate } from 'react-router-dom';
 
@@ -102,17 +100,13 @@ export default function Dashboard() {
   }, []);
 
   const handleCommunityClick = (communityId) => {
-    // Navigate to community page or show community details
     console.log('Community ID:', communityId);
-    // navigate(`/community/${communityId}`);
   };
 
   const handleCourseClick = (courseId) => {
-    // Navigate to course details page
     navigate(`/streamingcourse/${courseId}`);
   };
 
-  // Pagination logic
   const indexOfLastCourse = currentPage * coursesPerPage;
   const indexOfFirstCourse = indexOfLastCourse - coursesPerPage;
   const currentCourses = courses.slice(indexOfFirstCourse, indexOfLastCourse);

@@ -20,7 +20,6 @@ export default function CourseExchange() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch course data
         const courseResponse = await fetch(`http://localhost:5001/api/fetchById/${id}`);
         if (!courseResponse.ok) {
           throw new Error('Failed to fetch course data');
@@ -28,7 +27,6 @@ export default function CourseExchange() {
         const courseData = await courseResponse.json();
         setCourseData(courseData);
 
-        // Fetch exchange code if student is authenticated
         if (studentToken) {
           try {
             const codeResponse = await fetch(`http://localhost:5001/api/student/fetchMYExchangeCode/${id}`, {
@@ -95,7 +93,6 @@ export default function CourseExchange() {
         </div>
       </div>
       <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-6 px-6 pb-6">
-        {/* Left Side - Course Description & Syllabus */}
         <div className="lg:col-span-2 space-y-6">
           <div className="bg-white p-6 rounded-lg shadow-md mb-6">
             <p className="text-xs text-gray-500 font-semibold mb-2">

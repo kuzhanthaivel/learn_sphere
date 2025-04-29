@@ -5,7 +5,7 @@ contract Certificates {
     struct Certificate {
         address student;
         uint256 courseId;
-        string certificateHash; // Change this to metadata link (e.g., IPFS)
+        string certificateHash;
         uint256 issuedAt;
     }
 
