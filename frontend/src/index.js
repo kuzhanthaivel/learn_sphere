@@ -31,7 +31,7 @@ root.render(
         <Route path="/Community" element={<Community />} />
         <Route path="/CreatorCommunity" element={<CreatorCommunity />} />
         <Route path="/Profile" element={<Profile />} />
-        <Route path="/sharableProfile" element={<SharableProfile />} />
+        <Route path="/sharableProfile/:id" element={<SharableProfile />} />
         <Route path="/CourseBuying/:id" element={<CourseBuying />} />
         <Route path="/CourseExchange/:id" element={<CourseExchange />} />
         <Route path="/streamingcourse/:id" element={<StreamingCourse />} />

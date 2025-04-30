@@ -20,19 +20,16 @@ router.get('/', async (req, res) => {
     }
 
     const [courses, stats] = await Promise.all([
-      // Course data
       Course.find({ instructor: creator._id })
         .populate('community', '_id')
         .select('title category community students coverImage rating')
         .lean(),
-      
-      // Statistics
       Promise.all([
         Course.countDocuments({ instructor: creator._id }),
         Course.aggregate([
           { $match: { instructor: creator._id } },
-          { $project: { count: { $size: "$students" } } },
-          { $group: { _id: null, total: { $sum: "$count" } } } 
+          { $project: { count: { $size: { $ifNull: ["$students", []] } } } },
+          { $group: { _id: null, total: { $sum: "$count" } } }
         ]),
         Course.aggregate([
           { $match: { instructor: creator._id, rating: { $gt: 0 } } },
@@ -40,6 +37,7 @@ router.get('/', async (req, res) => {
         ])
       ])
     ]);
+    
 
     const response = {
       success: true,

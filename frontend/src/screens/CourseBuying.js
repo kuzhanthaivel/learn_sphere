@@ -24,6 +24,18 @@ export default function CourseBinding() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
+  const [isRenting, setIsRenting] = useState(false);
+
+  // Duration options with numeric day values
+  const durationOptions = {
+    "1 Day": { percentage: 5, coinsMultiplier: 10, days: 1 },
+    "3 Days": { percentage: 8, coinsMultiplier: 16, days: 3 },
+    "1 Week": { percentage: 15, coinsMultiplier: 30, days: 7 },
+    "2 Weeks": { percentage: 20, coinsMultiplier: 40, days: 14 },
+    "1 Month": { percentage: 35, coinsMultiplier: 70, days: 30 },
+    "3 Months": { percentage: 50, coinsMultiplier: 100, days: 90 },
+    "6 Months": { percentage: 70, coinsMultiplier: 140, days: 180 }
+  };
 
   useEffect(() => {
     checkWalletConnection();
@@ -95,16 +107,6 @@ export default function CourseBinding() {
   const disconnectWallet = () => {
     setWalletAddress("");
     setIsConnected(false);
-  };
-
-  const durationOptions = {
-    "1 Day": { percentage: 5, coinsMultiplier: 10 }, 
-    "3 Days": { percentage: 8, coinsMultiplier: 16 },
-    "1 Week": { percentage: 15, coinsMultiplier: 30 },
-    "2 Weeks": { percentage: 20, coinsMultiplier: 40 },
-    "1 Month": { percentage: 35, coinsMultiplier: 70 },
-    "3 Months": { percentage: 50, coinsMultiplier: 100 },
-    "6 Months": { percentage: 70, coinsMultiplier: 140 }
   };
 
   const handleDurationChange = (e) => {
@@ -179,6 +181,65 @@ export default function CourseBinding() {
       toast.error(error.message || 'Failed to purchase course');
     } finally {
       setIsPurchasing(false);
+    }
+  };
+
+  const handleRent = async () => {
+    if (!studentToken) {
+      toast.error("Please login to rent the course");
+      navigate('/signup');
+      return;
+    }
+
+    if (!paymentMethod) {
+      toast.error("Please select a payment method");
+      return;
+    }
+
+    if (!duration) {
+      toast.error("Please select a rental duration");
+      return;
+    }
+
+    setIsRenting(true);
+    try {
+      const response = await fetch('http://localhost:5001/api/rent', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${studentToken}`
+        },
+        body: JSON.stringify({
+          courseId: id,
+          transactionType: 'Rent',
+          paymentMethod: paymentMethod === 'coins' ? 'Coins' : 'Money',
+          amount: paymentMethod === 'money' ? rentalCost : undefined,
+          coinsVolume: paymentMethod === 'coins' ? coinsCost : undefined,
+          rentalDuration: durationOptions[duration].days // Send numeric days value
+        })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Rental failed');
+      }
+
+      toast.success(`Course rented for ${duration}! Access expires on ${new Date(data.rental.expiryDate).toLocaleDateString()}`);
+      console.log('Rental response:', data);
+      
+      navigate('/dashboard');
+
+    } catch (error) {
+      console.error('Rental error:', error);
+      if (error.name === 'JsonWebTokenError') {
+        toast.error('Session expired. Please login again.');
+        navigate('/login');
+        return;
+      }
+      toast.error(error.message || 'Failed to rent course');
+    } finally {
+      setIsRenting(false);
     }
   };
 
@@ -397,8 +458,14 @@ export default function CourseBinding() {
                 </div>
               )}
 
-              <button className="w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200">
-                Rent Course
+              <button 
+                onClick={handleRent}
+                disabled={isRenting || !paymentMethod || !duration}
+                className={`w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
+                  isRenting || !paymentMethod || !duration ? 'opacity-70 cursor-not-allowed' : ''
+                }`}
+              >
+                {isRenting ? 'Processing...' : 'Rent Course'}
               </button>
             </div>
           )}

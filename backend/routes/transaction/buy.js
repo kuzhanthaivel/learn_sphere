@@ -27,13 +27,11 @@ router.post('/', async (req, res) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     console.log(token);
     if (!token) {
-      console.log('Authentication failed: No token provided');
       return res.status(401).json({ error: 'Authentication required' });
     }
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CheckCheckHello123Mic123helllohello');
     const studentId = decoded.id;
-    console.log('Authenticated Student:', studentId);
 
     if (!courseId || !amount || isNaN(amount)) {
       console.log('Validation failed: Invalid input');
@@ -47,21 +45,17 @@ router.post('/', async (req, res) => {
 
     const course = await Course.findById(courseId).session(session);
     if (!course) {
-      console.log(`Course not found: ${courseId}`);
       await session.abortTransaction();
       return res.status(404).json({ error: 'Course not found' });
     }
-    console.log(`Purchasing course: ${course.title}`);
 
     const student = await Student.findById(studentId).session(session);
     if (!student) {
-      console.log(`Student not found: ${studentId}`);
       await session.abortTransaction();
       return res.status(404).json({ error: 'Student not found' });
     }
 
     if (student.ownedCourses.some(c => c.equals(courseId))) {
-      console.log('Student already owns this course');
       await session.abortTransaction();
       return res.status(409).json({ error: 'You already own this course' });
     }
@@ -86,7 +80,6 @@ router.post('/', async (req, res) => {
     const isFirstCourse = student.ownedCourses.length === 0;
     if (isFirstCourse) {
       student.badges.level2 = true;
-      console.log('Awarded first-course badge');
     }
 
     const pointsAndCoins = Math.floor(amount * 0.5);
@@ -116,7 +109,6 @@ router.post('/', async (req, res) => {
     ]);
 
     await session.commitTransaction();
-    console.log('Purchase completed successfully');
 
     res.status(201).json({
       success: true,
@@ -131,8 +123,7 @@ router.post('/', async (req, res) => {
     });
 
   } catch (error) {
-    await session.abortTransaction();
-    console.error('Purchase failed:', error);
+    await session.abortTransaction();;
     
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid token' });

@@ -25,7 +25,7 @@ const CommunityChat = () => {
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
-
+  
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
@@ -241,9 +241,6 @@ const CommunityChat = () => {
         </button>
         <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
         <a href="/"> <FaHome/> </a>    
-        </button>
-        <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-        <a href="/CretorSignup">  <IoSettingsOutline /> </a>   
         </button>
       </aside>
 

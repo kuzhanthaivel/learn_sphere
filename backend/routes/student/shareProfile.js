@@ -1,19 +1,17 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 const Student = require('../../models/Student');
 const Course = require('../../models/Course');
 
-router.get('/', async (req, res) => {
+router.post('/', async (req, res) => {
   try {
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const { userId } = req.body;
     
-    if (!token) {
-      return res.status(401).json({ error: 'Authorization token required' });
+    if (!userId) {
+      return res.status(400).json({ error: 'User ID required' });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const student = await Student.findById(decoded.id)
+    const student = await Student.findById(userId);
     
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
@@ -34,7 +32,7 @@ router.get('/', async (req, res) => {
     );
 
     const leaderboard = await Student.find()
-      .select('username leaderboardPoints profile.image') // Include profile.image here
+      .select('username leaderboardPoints profile.image')
       .sort({ leaderboardPoints: -1 });
 
     const userIndex = leaderboard.findIndex(u => u._id.toString() === student._id.toString());
@@ -48,7 +46,7 @@ router.get('/', async (req, res) => {
         name: student.username,
         place: userPosition,
         score: student.leaderboardPoints,
-        image: student.profile?.image || null // Add profile image for the current user
+        image: student.profile?.image || null
       });
     }
 
@@ -59,7 +57,7 @@ router.get('/', async (req, res) => {
           name: leaderboard[nextIndex].username,
           place: nextIndex + 1,
           score: leaderboard[nextIndex].leaderboardPoints,
-          image: leaderboard[nextIndex].profile?.image || null // Add profile image for other users
+          image: leaderboard[nextIndex].profile?.image || null
         });
       }
     }
@@ -77,14 +75,6 @@ router.get('/', async (req, res) => {
 
   } catch (error) {
     console.error('Profile error:', error);
-    
-    if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ error: 'Invalid token' });
-    }
-    if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ error: 'Token expired' });
-    }
-    
     res.status(500).json({ error: 'Server error' });
   }
 });

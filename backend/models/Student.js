@@ -34,7 +34,8 @@ const StudentSchema = new mongoose.Schema({
       amountPaid: { type: Number, required: true, min: 0 },
       durationDays: { type: Number, required: true, min: 1 },
       expiryDate: { type: Date, required: true },
-      rentedAt: { type: Date, default: Date.now }
+      rentedAt: { type: Date, default: Date.now },
+      status: { type: String, enum: ['Available', 'Expired' ], default: 'Available' },
     }], 
     default: [] 
   },

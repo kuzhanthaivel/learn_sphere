@@ -129,7 +129,7 @@ const CommunityChat = () => {
       content: message,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isYou: true,
-      userType: "Student" // Assuming current user is always student in this context
+      userType: "Student" 
     };
     
     setMessages(prev => [...prev, tempMessage]);
@@ -240,9 +240,6 @@ const CommunityChat = () => {
         </button>
         <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
         <a href="/"> <FaHome/> </a>    
-        </button>
-        <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-        <a href="/CretorSignup">  <IoSettingsOutline /> </a>   
         </button>
       </aside>
 

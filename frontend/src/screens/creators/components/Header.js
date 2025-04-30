@@ -151,7 +151,7 @@ const Navbar = () => {
               </Link>
             </button>
             <button className="px-4 py-2 text-white bg-green-500 rounded-lg cursor-pointer">
-              <Link to="/CreatorSignup">Sign up</Link>
+              <Link to="/CretorSignup">Sign up</Link>
             </button>
           </>
         )}

@@ -1,6 +1,7 @@
 const jwt = require('jsonwebtoken');
 const Student = require('../../models/Student');
 const Course = require('../../models/Course');
+const Community = require('../../models/Community');
 const express = require('express');
 const router = express.Router();
 
@@ -14,11 +15,17 @@ router.get('/', async (req, res) => {
         
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
+        // First, check for expired rented courses and update them
+        await checkAndUpdateExpiredRentals(decoded.id);
 
         const student = await Student.findById(decoded.id)
-            .select('ownedCourses')
+            .select('ownedCourses rentedCourses')
             .populate({
                 path: 'ownedCourses',
+                select: '_id title shortDescription category community coverImage'
+            })
+            .populate({
+                path: 'rentedCourses.course',
                 select: '_id title shortDescription category community coverImage'
             });
         
@@ -26,22 +33,42 @@ router.get('/', async (req, res) => {
             return res.status(404).json({ error: 'Student not found' });
         }
 
+        // Process owned courses
         const ownedCourses = student.ownedCourses.map(course => ({
             id: course._id,
             title: course.title,
-            shortDescription: course.shortDescription,
+            shortDescription: course.shortDescription, 
             category: course.category,
             community: course.community, 
-            coverImage: course.coverImage
+            coverImage: course.coverImage,
+            accessType: 'owned'
         }));
+
+        // Process rented courses (only available ones)
+        const rentedCourses = student.rentedCourses
+            .filter(rental => rental.status === 'Available')
+            .map(rental => ({
+                id: rental.course._id,
+                title: rental.course.title,
+                shortDescription: rental.course.shortDescription,
+                category: rental.course.category,
+                community: rental.course.community,
+                coverImage: rental.course.coverImage,
+                accessType: 'rented',
+                expiryDate: rental.expiryDate,
+                daysRemaining: Math.ceil((rental.expiryDate - Date.now()) / (1000 * 60 * 60 * 24))
+            }));
+
+        // Combine both lists
+        const response = [...ownedCourses, ...rentedCourses];
 
         res.json({
             success: true,
-            data: ownedCourses
+            data: response
         });
         
     } catch (error) {
-        console.error('Error fetching owned courses:', error);
+        console.error('Error fetching courses:', error);
         
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({ error: 'Invalid token' });
@@ -58,5 +85,67 @@ router.get('/', async (req, res) => {
         });
     }
 });
+
+async function checkAndUpdateExpiredRentals(studentId) {
+    const now = new Date();
+    
+    // Find student with rented courses that are available but expired
+    const student = await Student.findOne({
+        _id: studentId,
+        'rentedCourses': {
+            $elemMatch: {
+                status: 'Available',
+                expiryDate: { $lte: now }
+            }
+        }
+    }).select('rentedCourses communities');
+    
+    if (!student) return;
+
+    const expiredRentals = student.rentedCourses.filter(
+        rental => rental.status === 'Available' && rental.expiryDate <= now
+    );
+
+    if (expiredRentals.length === 0) return;
+
+    const updatePromises = expiredRentals.map(async (rental) => {
+            
+        await Student.updateOne(
+            { _id: studentId, 'rentedCourses._id': rental._id },
+            { $set: { 'rentedCourses.$.status': 'Expired' } }
+        );
+
+        const isOwned = student.ownedCourses.includes(rental.course);
+        if (!isOwned) {
+            await Course.updateOne(
+                { _id: rental.course },
+                { $pull: { students: studentId } }
+            );
+        }
+
+        const course = await Course.findById(rental.course).select('community');
+        if (course?.community) {
+
+            await Community.updateOne(
+                { _id: course.community },
+                { $pull: { members: { user: studentId } } }
+            );
+            
+            const otherCoursesInCommunity = await Course.countDocuments({
+                community: course.community,
+                students: studentId
+            });
+            
+            if (otherCoursesInCommunity === 0) {
+                await Student.updateOne(
+                    { _id: studentId },
+                    { $pull: { communities: course.community } }
+                );
+            }
+        }
+    });
+
+    await Promise.all(updatePromises);
+}
 
 module.exports = router;
