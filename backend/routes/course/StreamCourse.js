@@ -6,7 +6,6 @@ const router = express.Router();
 
 router.get('/:courseId', async (req, res) => {
     try {
-        console.log('Starting course streaming request');
         const token = req.header('Authorization')?.replace('Bearer ', '');
         const courseId = req.params.courseId;
         

@@ -3,20 +3,18 @@ pragma solidity ^0.8.0;
 
 contract Transactions {
     enum TransactionType { Buy, Rent, Exchange }
-
-    struct ExchangeData {
-        string initiatorCode;
-        string receiverCode;
-    }
+    enum PaymentMethod { Money, Coins } 
 
     struct Transaction {
+        uint256 transactionId;
         address user;
-        uint256 courseId;
-        TransactionType transactionType;
-        uint256 amount;
-        string rentalDuration;
-        ExchangeData exchangeData; 
         uint256 timestamp;
+        string courseName;
+        string courseCategory;
+        TransactionType transactionType;
+        PaymentMethod paymentMethod;
+        uint256 amount; 
+        uint256 exchangeId;
     }
 
     mapping(uint256 => Transaction) public transactions; 
@@ -25,42 +23,46 @@ contract Transactions {
     event TransactionCreated(
         uint256 indexed transactionId,
         address indexed user,
-        uint256 courseId,
+        uint256 timestamp,
+        string courseName,
+        string courseCategory,
         TransactionType transactionType,
+        PaymentMethod paymentMethod,
         uint256 amount,
-        string rentalDuration,
-        ExchangeData exchangeData,
-        uint256 timestamp
+        uint256 exchangeId
     );
 
     function createTransaction(
-        uint256 courseId,
+        string memory courseName,
+        string memory courseCategory,
         TransactionType transactionType,
+        PaymentMethod paymentMethod,
         uint256 amount,
-        string memory rentalDuration,
-        string memory initiatorCode,
-        string memory receiverCode
+        uint256 exchangeId
     ) public {
         transactionCounter++;
         transactions[transactionCounter] = Transaction(
+            transactionCounter,
             msg.sender,
-            courseId,
+            block.timestamp,
+            courseName,
+            courseCategory,
             transactionType,
+            paymentMethod,
             amount,
-            rentalDuration,
-            ExchangeData(initiatorCode, receiverCode),
-            block.timestamp
+            exchangeId
         );
 
         emit TransactionCreated(
             transactionCounter,
             msg.sender,
-            courseId,
+            block.timestamp,
+            courseName,
+            courseCategory,
             transactionType,
+            paymentMethod,
             amount,
-            rentalDuration,
-            ExchangeData(initiatorCode, receiverCode),
-            block.timestamp
+            exchangeId
         );
     }
 

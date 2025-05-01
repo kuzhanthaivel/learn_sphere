@@ -25,23 +25,21 @@ router.post('/', async (req, res) => {
     const { courseId, amount } = req.body;
 
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    console.log(token);
     if (!token) {
       return res.status(401).json({ error: 'Authentication required' });
     }
     
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'CheckCheckHello123Mic123helllohello');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET );
     const studentId = decoded.id;
 
     if (!courseId || !amount || isNaN(amount)) {
-      console.log('Validation failed: Invalid input');
       await session.abortTransaction();
       return res.status(400).json({ 
         error: 'Invalid input',
         details: !courseId ? 'Missing courseId' : 
                 !amount ? 'Missing amount' : 'Amount must be a number'
       });
-    }
+          }
 
     const course = await Course.findById(courseId).session(session);
     if (!course) {

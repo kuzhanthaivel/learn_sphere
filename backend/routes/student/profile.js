@@ -34,7 +34,7 @@ router.get('/', async (req, res) => {
     );
 
     const leaderboard = await Student.find()
-      .select('username leaderboardPoints profile.image') // Include profile.image here
+      .select('username leaderboardPoints profile.image') 
       .sort({ leaderboardPoints: -1 });
 
     const userIndex = leaderboard.findIndex(u => u._id.toString() === student._id.toString());
