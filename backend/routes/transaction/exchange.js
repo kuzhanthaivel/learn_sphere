@@ -8,53 +8,39 @@ const ExchangeCode = require('../../models/ExchangeCode');
 const ExchangeRequest = require('../../models/ExchangeRequest');
 const Transaction = require('../../models/Transaction');
 
-// Helper function to generate exchange code
 function generatePermanentCode(studentId, courseId) {
-  console.log(`Generating code for student ${studentId} and course ${courseId}`);
   const combined = `${studentId}${courseId}`;
   const hash = crypto.createHash('sha1').update(combined).digest('hex');
   return hash.slice(0, 10).toUpperCase(); 
 }
 
 router.post('/', async (req, res) => {
-  console.log('Exchange request received:', req.body);
   
   try {
 
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    console.log('Token received:', token ? 'present' : 'missing');
     
     if (!token) {
-      console.log('Authorization failed: no token provided');
       return res.status(401).json({ error: 'Authorization token required' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log('Decoded token:', decoded);
-    
     const student = await Student.findById(decoded.id);
     if (!student) {
-      console.log(`Student not found with ID: ${decoded.id}`);
       return res.status(404).json({ error: 'Student not found' });
     }
 
-    console.log(`Authenticated as student: ${student._id}`);
-
     const { requestId, userType, status } = req.body;
-    console.log(`Processing request: ${requestId}, userType: ${userType}, status: ${status}`);
 
     if (!requestId || !userType || !status) {
-      console.log('Validation failed: missing required fields');
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
     if (!['initiator', 'receiver'].includes(userType)) {
-      console.log(`Invalid userType: ${userType}`);
       return res.status(400).json({ error: 'Invalid userType' });
     }
 
     if (!['Canceled', 'Accepted'].includes(status)) {
-      console.log(`Invalid status: ${status}`);
       return res.status(400).json({ error: 'Invalid status' });
     }
 
@@ -210,8 +196,8 @@ router.post('/', async (req, res) => {
 
       // Create transaction record
       const transaction = new Transaction({
-        user: exchangeRequest.initiator,
-        course: initiatorCourse._id,
+        user: exchangeRequest.receiver,
+        course: receiverCourse._id,
         transactionType: 'Exchange',
         paymentMethod: 'Exchange',
         exchangeData: exchangeRequest._id,

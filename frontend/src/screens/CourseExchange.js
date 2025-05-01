@@ -5,6 +5,7 @@ import React, { useState, useEffect } from "react";
 import { MdArrowBackIos } from "react-icons/md";
 import Syllabus from '../assets/syllabus.png';
 import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
 export default function CourseExchange() {
   const { id } = useParams();
@@ -24,6 +25,46 @@ export default function CourseExchange() {
   });
   const [exchangeRequest, setExchangeRequest] = useState(null);
   const [requestLoading, setRequestLoading] = useState(true);
+  const [walletAddress, setWalletAddress] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+        setIsConnected(true);
+        
+        window.ethereum.on('accountsChanged', (newAccounts) => {
+          if (newAccounts.length > 0) {
+            setWalletAddress(newAccounts[0]);
+          } else {
+            setWalletAddress("");
+            setIsConnected(false);
+          }
+        });
+        
+        window.ethereum.on('chainChanged', () => {
+          window.location.reload();
+        });
+        
+      } catch (error) {
+        console.error("User rejected request:", error);
+        if (error.code === 4001) {
+          toast.error("Please connect to MetaMask to continue.");
+        }
+      }
+    } else {
+      toast.error("MetaMask is not installed. Please install it to use this feature.");
+      window.open('https://metamask.io/download.html', '_blank');
+    }
+  };
+
+  const disconnectWallet = () => {
+    setWalletAddress("");
+    setIsConnected(false);
+  };
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -221,8 +262,7 @@ export default function CourseExchange() {
       });
 
       setExchangeRequest(null);
-
-       navigate('dashboard'); 
+       navigate('/dashboard'); 
     } catch (err) {
       setExchangeStatus({
         loading: false,
@@ -364,7 +404,14 @@ export default function CourseExchange() {
                       )}
                     </button>
                   ) : (
-                    <>
+
+<div className="flex items-center flex-col w-full">
+  
+
+
+
+
+                    <div className="w-full flex justify-between gap-3 pb-3">
                       <button 
                         className={`flex-1 bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${
                           exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
@@ -383,7 +430,35 @@ export default function CourseExchange() {
                       >
                         Accept
                       </button>
-                    </>
+                  
+
+                      
+                    </div>
+
+                    {isConnected ? (
+            <div className="mb-4 w-full">
+              <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
+                <span className="text-sm font-medium text-green-800 truncate">
+                  {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
+                </span>
+                <button 
+                  onClick={disconnectWallet}
+                  className="text-xs text-red-500 hover:text-red-700"
+                >
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button 
+              onClick={connectWallet}
+              className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
+            >
+              Connect Wallet
+            </button>
+          )}
+                    </div>
+
                   )}
                 </div>
               </>
@@ -409,14 +484,13 @@ export default function CourseExchange() {
                 {exchangeStatus.success && (
                   <div className="text-green-500 text-sm mb-2">{exchangeStatus.success}</div>
                 )}
-                
+
                 <button 
                   className={`w-full bg-[#20B486] text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
                     !exchangeCode || exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                   disabled={!exchangeCode || exchangeStatus.loading}
-                  onClick={handleExchangeRequest}
-                >
+                  onClick={handleExchangeRequest} >
                   {exchangeStatus.loading ? (
                     <span className="flex items-center justify-center">
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

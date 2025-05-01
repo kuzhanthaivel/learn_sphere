@@ -6,7 +6,7 @@ import { MdArrowBackIos } from "react-icons/md";
 import Syllabus from '../assets/syllabus.png';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaExclamationTriangle } from "react-icons/fa";
-import { toast } from 'react-toastify';
+  import { toast } from 'react-toastify';
 
 export default function CourseBinding() {
   const { id } = useParams();
@@ -323,7 +323,6 @@ export default function CourseBinding() {
             </div>
           </div>
         </div>
-
         <div className="bg-white p-6 rounded-lg shadow-md w-auto lg:w-80 lg:h-auto">
           <img
             src={imageUrl}
@@ -343,10 +342,10 @@ export default function CourseBinding() {
             >
               Rentals
             </button>
-          </div>
+          </div> 
           {isConnected ? (
-            <div className="mb-4">
-              <div className="flex items-center justify-between bg-green-50 p-2 rounded-lg">
+            <div className="mb-4 w-full">
+              <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
                 <span className="text-sm font-medium text-green-800 truncate">
                   {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
                 </span>

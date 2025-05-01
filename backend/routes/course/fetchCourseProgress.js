@@ -53,7 +53,6 @@ router.put('/', async (req, res) => {
     };
 
     res.status(200).json(response);
-    console.log( response );
   } catch (error) {
     console.error('Error fetching course progress:', error);
     

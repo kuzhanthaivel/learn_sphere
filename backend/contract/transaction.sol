@@ -1,89 +1,73 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Transactions {
-    enum TransactionType { Buy, Rent, Exchange }
-    enum PaymentMethod { Money, Coins } 
+contract PaymentDetails {
 
-    struct Transaction {
-        uint256 transactionId;
+    struct Payment {
+        string transactionId; 
         address user;
-        uint256 timestamp;
+        string timestamp; 
         string courseName;
-        string courseCategory;
-        TransactionType transactionType;
-        PaymentMethod paymentMethod;
-        uint256 amount; 
-        uint256 exchangeId;
+        string courseCategory;  
+        string transactionType;
+        string paymentMethod;
+        string amount; 
+        string exchangeId; 
     }
 
-    mapping(uint256 => Transaction) public transactions; 
-    uint256 public transactionCounter;
+    Payment[] private payments;
 
-    event TransactionCreated(
-        uint256 indexed transactionId,
+    event PaymentAdded(
+        string transactionId, 
         address indexed user,
-        uint256 timestamp,
+        string timestamp,
         string courseName,
         string courseCategory,
-        TransactionType transactionType,
-        PaymentMethod paymentMethod,
-        uint256 amount,
-        uint256 exchangeId
+        string transactionType,
+        string paymentMethod,
+        string amount, 
+        string exchangeId 
     );
 
-    function createTransaction(
-        string memory courseName,
-        string memory courseCategory,
-        TransactionType transactionType,
-        PaymentMethod paymentMethod,
-        uint256 amount,
-        uint256 exchangeId
+    function addPayment(
+        string memory _transactionId,
+        address _user,
+        string memory _timestamp,
+        string memory _courseName,
+        string memory _courseCategory,
+        string memory _transactionType,
+        string memory _paymentMethod,
+        string memory _amount,
+        string memory _exchangeId 
     ) public {
-        transactionCounter++;
-        transactions[transactionCounter] = Transaction(
-            transactionCounter,
-            msg.sender,
-            block.timestamp,
-            courseName,
-            courseCategory,
-            transactionType,
-            paymentMethod,
-            amount,
-            exchangeId
+        Payment memory newPayment = Payment(
+            _transactionId,
+            _user,
+            _timestamp,
+            _courseName,
+            _courseCategory,
+            _transactionType,
+            _paymentMethod,
+            _amount,
+            _exchangeId
         );
 
-        emit TransactionCreated(
-            transactionCounter,
-            msg.sender,
-            block.timestamp,
-            courseName,
-            courseCategory,
-            transactionType,
-            paymentMethod,
-            amount,
-            exchangeId
+        payments.push(newPayment);
+
+        emit PaymentAdded(
+            _transactionId,
+            _user,
+            _timestamp,
+            _courseName,
+            _courseCategory,
+            _transactionType,
+            _paymentMethod,
+            _amount,
+            _exchangeId
         );
     }
 
-    function getTransactionsByAddress(address user) public view returns (Transaction[] memory) {
-        uint256 count;
-        for (uint256 i = 1; i <= transactionCounter; i++) {
-            if (transactions[i].user == user) {
-                count++;
-            }
-        }
-
-        Transaction[] memory result = new Transaction[](count);
-        uint256 index;
-
-        for (uint256 i = 1; i <= transactionCounter; i++) {
-            if (transactions[i].user == user) {
-                result[index] = transactions[i];
-                index++;
-            }
-        }
-
-        return result;
+    function getAllPayments() public view returns (Payment[] memory) {
+        return payments;
     }
 }

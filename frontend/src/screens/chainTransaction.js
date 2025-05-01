@@ -1,7 +1,8 @@
 import Navbar from "../components/Header";
 import Footer from "../components/footer";
 import { MdArrowBackIos } from "react-icons/md";
-
+import { toast } from 'react-toastify';
+import React, { useState, useEffect } from "react";
 const courses = [
   { 
     id: 1,
@@ -135,6 +136,45 @@ export default function ChainTransaction() {
       exchange: null
     }
   ];
+  const studentToken = localStorage.getItem('studentToken');
+  const [walletAddress, setWalletAddress] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+        setIsConnected(true);
+        
+        window.ethereum.on('accountsChanged', (newAccounts) => {
+          if (newAccounts.length > 0) {
+            setWalletAddress(newAccounts[0]);
+          } else {
+            setWalletAddress("");
+            setIsConnected(false);
+          }
+        });
+        
+        window.ethereum.on('chainChanged', () => {
+          window.location.reload();
+        });
+        
+      } catch (error) {
+        console.error("User rejected request:", error);
+        if (error.code === 4001) {
+          toast.error("Please connect to MetaMask to continue.");
+        }
+      }
+    } else {
+      toast.error("MetaMask is not installed. Please install it to use this feature.");
+      window.open('https://metamask.io/download.html', '_blank');
+    }
+  };
+
+  const disconnectWallet = () => {
+    setWalletAddress("");
+    setIsConnected(false);
+  };
 
   const getCourseDetails = (id) => {
     return courses.find(course => course.id === id) || { title: "Unknown Course", category: "Unknown" };
@@ -172,12 +212,39 @@ export default function ChainTransaction() {
 
       <main className="flex-1 px-4 py-6 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto">
+          <div className=" flex justify-between">
           <div className="flex items-center space-x-2 text-[#20B486] font-semibold text-xl mb-6">
             <button className="border border-gray-200 py-2 pl-3 pr-1 rounded-xl cursor-pointer text-black text-center hover:bg-gray-100 transition-colors">
               <MdArrowBackIos />
             </button>
             <span>Your Transactions</span>
           </div>
+          <div>
+          {isConnected ? (
+            <div className=" w-56">
+              <div className="px-3 h-11 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
+                <span className="text-sm font-medium text-green-800 truncate">
+                  {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
+                </span>
+                <button 
+                  onClick={disconnectWallet}
+                  className="text-xs text-red-500 hover:text-red-700"
+                >
+                  Disconnect
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button 
+              onClick={connectWallet}
+              className="px-3 py-2 font-semibold w-56 h-11 bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
+            >
+              Connect Wallet
+            </button>
+          )}
+          </div>
+          </div>
+
 
           <div className="overflow-x-auto rounded-xl border border-gray-200 shadow-sm">
             <table className="w-full text-left border-collapse">

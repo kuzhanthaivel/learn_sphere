@@ -16,10 +16,9 @@ const CourseCard = ({
   community,
   onCommunityClick
 }) => {
-      // Construct the full image URL for uploaded images
         const imageUrl = coverImage 
           ? `http://localhost:5001/${coverImage.replace(/\\/g, '/')}`
-          : CoverImage1; // Fallback to default image if none uploaded
+          : CoverImage1;
       
   return (
     <div className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105">

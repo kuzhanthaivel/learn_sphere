@@ -24,6 +24,7 @@ const Buy = require('./routes/transaction/buy');
 const Rent = require('./routes/transaction/rent'); 
 const createExchangeRequst = require('./routes/transaction/createExchangeRequst'); 
 const fetchExchangeRequest = require('./routes/transaction/fetchExchangeRequest'); 
+const fetchTransaction = require('./routes/transaction/fetchTransaction'); 
 const Exchange = require('./routes/transaction/exchange'); 
 const creatorDashboard = require('./routes/creator/dashboard'); 
 const studentProfile = require('./routes/student/profile'); 
@@ -60,6 +61,7 @@ app.use('/api/fetchAllCoures', fetchAllCoures);
 app.use('/api/fetchById', FetchById);
 app.use('/api/buy', Buy);
 app.use('/api/rent', Rent);
+app.use('/api/fetchTransaction', fetchTransaction);
 app.use('/api/exchange', Exchange);
 app.use('/api/createExchangeRequst', createExchangeRequst);
 app.use('/api/fetchExchangeRequest', fetchExchangeRequest);
@@ -79,3 +81,4 @@ const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
+

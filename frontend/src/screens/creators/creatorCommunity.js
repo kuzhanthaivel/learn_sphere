@@ -3,9 +3,8 @@ import chatbg from "../../assets/chatbg.png";
 import learnSphere from '../../assets/learnSphere.png'
 import { RiCommunityLine } from "react-icons/ri";
 import { FaHome } from "react-icons/fa";
-import { IoSettingsOutline } from "react-icons/io5";
 import { VscVerifiedFilled } from "react-icons/vsc";
-import { useParams, useNavigate } from 'react-router-dom';
+import {  useNavigate } from 'react-router-dom';
 
 const CommunityChat = () => {
   const [message, setMessage] = useState("");
@@ -258,7 +257,6 @@ const CommunityChat = () => {
             </div>
           )}
         </header>
-
         {error && (
           <div className="bg-red-900 text-white p-2 text-center text-sm">
             {error}
@@ -311,7 +309,6 @@ const CommunityChat = () => {
             )}
           </div>
         </div>
-
         <div className="bg-gray-800 p-4 flex items-center border-t border-gray-700">
           <input
             type="text"
