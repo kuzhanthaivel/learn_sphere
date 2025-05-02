@@ -8,14 +8,13 @@ const router = express.Router();
 router.get('/', async (req, res) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
-        
+
         if (!token) {
             return res.status(401).json({ error: 'Authorization token required' });
         }
-        
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
-        // First, check for expired rented courses and update them
+
         await checkAndUpdateExpiredRentals(decoded.id);
 
         const student = await Student.findById(decoded.id)
@@ -28,23 +27,21 @@ router.get('/', async (req, res) => {
                 path: 'rentedCourses.course',
                 select: '_id title shortDescription category community coverImage'
             });
-        
+
         if (!student) {
             return res.status(404).json({ error: 'Student not found' });
         }
 
-        // Process owned courses
         const ownedCourses = student.ownedCourses.map(course => ({
             id: course._id,
             title: course.title,
-            shortDescription: course.shortDescription, 
+            shortDescription: course.shortDescription,
             category: course.category,
-            community: course.community, 
+            community: course.community,
             coverImage: course.coverImage,
             accessType: 'owned'
         }));
 
-        // Process rented courses (only available ones)
         const rentedCourses = student.rentedCourses
             .filter(rental => rental.status === 'Available')
             .map(rental => ({
@@ -59,37 +56,35 @@ router.get('/', async (req, res) => {
                 daysRemaining: Math.ceil((rental.expiryDate - Date.now()) / (1000 * 60 * 60 * 24))
             }));
 
-        // Combine both lists
         const response = [...ownedCourses, ...rentedCourses];
 
         res.json({
             success: true,
             data: response
         });
-        
+
     } catch (error) {
         console.error('Error fetching courses:', error);
-        
+
         if (error.name === 'JsonWebTokenError') {
             return res.status(401).json({ error: 'Invalid token' });
         }
-        
+
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ error: 'Token expired' });
         }
-        
-        res.status(500).json({ 
+
+        res.status(500).json({
             success: false,
             error: 'Internal server error',
-            message: error.message 
+            message: error.message
         });
     }
 });
 
 async function checkAndUpdateExpiredRentals(studentId) {
     const now = new Date();
-    
-    // Find student with rented courses that are available but expired
+
     const student = await Student.findOne({
         _id: studentId,
         'rentedCourses': {
@@ -99,7 +94,7 @@ async function checkAndUpdateExpiredRentals(studentId) {
             }
         }
     }).select('rentedCourses communities');
-    
+
     if (!student) return;
 
     const expiredRentals = student.rentedCourses.filter(
@@ -109,7 +104,7 @@ async function checkAndUpdateExpiredRentals(studentId) {
     if (expiredRentals.length === 0) return;
 
     const updatePromises = expiredRentals.map(async (rental) => {
-            
+
         await Student.updateOne(
             { _id: studentId, 'rentedCourses._id': rental._id },
             { $set: { 'rentedCourses.$.status': 'Expired' } }
@@ -130,12 +125,12 @@ async function checkAndUpdateExpiredRentals(studentId) {
                 { _id: course.community },
                 { $pull: { members: { user: studentId } } }
             );
-            
+
             const otherCoursesInCommunity = await Course.countDocuments({
                 community: course.community,
                 students: studentId
             });
-            
+
             if (otherCoursesInCommunity === 0) {
                 await Student.updateOne(
                     { _id: studentId },

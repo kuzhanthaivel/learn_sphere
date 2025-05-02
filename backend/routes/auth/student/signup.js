@@ -24,26 +24,26 @@ const fileFilter = (req, file, cb) => {
   }
 };
 
-const upload = multer({ 
+const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 1024 * 1024 * 5 
+    fileSize: 1024 * 1024 * 5
   },
   fileFilter: fileFilter
 });
 
 router.post('/', upload.single('image'), async (req, res) => {
   try {
-    const { 
-      email, 
-      password, 
-      username, 
-      walletAddress, 
-      bio, 
-      github, 
-      linkedin, 
-      twitter, 
-      portfolio 
+    const {
+      email,
+      password,
+      username,
+      walletAddress,
+      bio,
+      github,
+      linkedin,
+      twitter,
+      portfolio
     } = req.body;
 
     if (!email || !password || !username) {
@@ -64,9 +64,9 @@ router.post('/', upload.single('image'), async (req, res) => {
       username,
       walletAddress,
       leaderboardPoints: 100,
-      coins: 100, // Initial coins set to 100
+      coins: 100,
       badges: {
-        level1: true, 
+        level1: true,
       },
       profile: {
         bio,
@@ -86,21 +86,21 @@ router.post('/', upload.single('image'), async (req, res) => {
       message: 'Student registered successfully!',
       studentId: newStudent._id,
       coins: newStudent.coins,
-      level1: true, 
+      level1: true,
       profileImage: req.file ? req.file.path : null
     });
   } catch (err) {
     console.error(err);
-    
+
     if (err instanceof multer.MulterError) {
       if (err.code === 'LIMIT_FILE_SIZE') {
         return res.status(400).json({ error: 'File too large. Maximum 5MB allowed.' });
       }
       return res.status(400).json({ error: err.message });
     }
-    
-    res.status(500).json({ 
-      error: err.message || 'Server error. Please try again later.' 
+
+    res.status(500).json({
+      error: err.message || 'Server error. Please try again later.'
     });
   }
 });

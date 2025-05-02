@@ -6,6 +6,7 @@ import { MdArrowBackIos } from "react-icons/md";
 import Syllabus from '../assets/syllabus.png';
 import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { getContract } from "../contractIntegration/Transaction";
 
 export default function CourseExchange() {
   const { id } = useParams();
@@ -27,7 +28,21 @@ export default function CourseExchange() {
   const [requestLoading, setRequestLoading] = useState(true);
   const [walletAddress, setWalletAddress] = useState("");
   const [isConnected, setIsConnected] = useState(false);
-
+  const [blockchainLoading, setBlockchainLoading] = useState(false);
+  
+  const checkWalletConnection = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+          setIsConnected(true);
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error);
+      }
+    }
+  };
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
@@ -67,6 +82,7 @@ export default function CourseExchange() {
 
 
   useEffect(() => {
+    checkWalletConnection()
     const fetchData = async () => {
       try {
         const courseResponse = await fetch(`http://localhost:5001/api/fetchById/${id}`);
@@ -250,11 +266,37 @@ export default function CourseExchange() {
       });
   
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to accept exchange request');
       }
-  
+
+      // Record transaction on blockchain
+      setBlockchainLoading(true);
+      try {
+        const contract = getContract();
+        if (contract) {
+          const tx = await contract.addPayment(
+            data.data.transactionId,
+            walletAddress,
+            Math.floor(new Date(data.data.timestamp).getTime() / 1000),
+            data.data.courseName,
+            data.data.courseCategory,
+            data.data.transactionType,
+            data.data.paymentMethod,
+            '0', // Amount is 0 for exchanges
+            data.data.exchangeId
+          );
+          await tx.wait();
+          toast.success(`Exchange recorded on blockchain! TX Hash: ${tx.hash}`);
+        }
+      } catch (blockchainError) {
+        console.error("Blockchain transaction failed:", blockchainError);
+        toast.warning("Exchange completed but blockchain recording failed");
+      } finally {
+        setBlockchainLoading(false);
+      }
+
       setExchangeStatus({
         loading: false,
         error: null,
@@ -262,7 +304,7 @@ export default function CourseExchange() {
       });
 
       setExchangeRequest(null);
-       navigate('/dashboard'); 
+      navigate('/dashboard'); 
     } catch (err) {
       setExchangeStatus({
         loading: false,
@@ -404,61 +446,51 @@ export default function CourseExchange() {
                       )}
                     </button>
                   ) : (
+                    <div className="flex items-center flex-col w-full">
+                      <div className="w-full flex justify-between gap-3 pb-3">
+                        <button 
+                          className={`flex-1 bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${
+                            exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          disabled={exchangeStatus.loading}
+                          onClick={handleCancelRequest}
+                        >
+                          Cancel
+                        </button>
+                        <button 
+                          className={`flex-1 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
+                            exchangeStatus.loading || blockchainLoading ? 'opacity-50 cursor-not-allowed' : ''
+                          }`}
+                          disabled={exchangeStatus.loading || blockchainLoading}
+                          onClick={handleAcceptRequest}
+                        >
+                          {blockchainLoading ? 'Blockchain...' : 'Accept'}
+                        </button>
+                      </div>
 
-<div className="flex items-center flex-col w-full">
-  
-
-
-
-
-                    <div className="w-full flex justify-between gap-3 pb-3">
-                      <button 
-                        className={`flex-1 bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${
-                          exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        disabled={exchangeStatus.loading}
-                        onClick={handleCancelRequest}
-                      >
-                        Cancel
-                      </button>
-                      <button 
-                        className={`flex-1 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                          exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
-                        }`}
-                        disabled={exchangeStatus.loading}
-                        onClick={handleAcceptRequest}
-                      >
-                        Accept
-                      </button>
-                  
-
-                      
+                      {isConnected ? (
+                        <div className="mb-4 w-full">
+                          <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
+                            <span className="text-sm font-medium text-green-800 truncate">
+                              {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
+                            </span>
+                            <button 
+                              onClick={disconnectWallet}
+                              className="text-xs text-red-500 hover:text-red-700"
+                            >
+                              Disconnect
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={connectWallet}
+                          className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
+                        >
+                          Connect Wallet
+                        </button>
+                      )}
                     </div>
-
-                    {isConnected ? (
-            <div className="mb-4 w-full">
-              <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
-                <span className="text-sm font-medium text-green-800 truncate">
-                  {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
-                </span>
-                <button 
-                  onClick={disconnectWallet}
-                  className="text-xs text-red-500 hover:text-red-700"
-                >
-                  Disconnect
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button 
-              onClick={connectWallet}
-              className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
-            >
-              Connect Wallet
-            </button>
-          )}
-                    </div>
-
                   )}
                 </div>
               </>
@@ -490,7 +522,8 @@ export default function CourseExchange() {
                     !exchangeCode || exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
                   }`}
                   disabled={!exchangeCode || exchangeStatus.loading}
-                  onClick={handleExchangeRequest} >
+                  onClick={handleExchangeRequest}
+                >
                   {exchangeStatus.loading ? (
                     <span className="flex items-center justify-center">
                       <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">

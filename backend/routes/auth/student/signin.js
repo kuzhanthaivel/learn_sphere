@@ -27,19 +27,19 @@ router.post('/', async (req, res) => {
         const token = jwt.sign(
             { id: user._id, email: user.email },
             JWT_SECRET,
-            { expiresIn: '1d' } 
+            { expiresIn: '1d' }
         );
         user.token = token;
         user.coins += 2;
         user.leaderboardPoints += 2;
 
         if (user.badges === undefined || user.badges === null) {
-            user.badges = []; 
+            user.badges = [];
         }
 
 
         await user.save();
-        
+
         res.status(200).json({
             message: 'Signin successful',
             token,
@@ -57,7 +57,7 @@ router.post('/', async (req, res) => {
                 portfolio: user.portfolio
             }
         });
-    }catch (error) {
+    } catch (error) {
         console.error('Error during signin:', error);
         res.status(500).json({ message: 'An error occurred during signin. Please try again later.' });
     }

@@ -379,7 +379,7 @@ src={getImageUrl(profileData.leaderboard[2].image)}
                     coverImage={course.coverImage}
                     category={course.category}
                     isSelected={selectedCourse === course.certificateID}
-                    onClick={() => setSelectedCourse(course.certificateID)}
+                    onClick={() => navigate(`/Certificate/${course.certificateID}`)}
                     completedAt={course.completedAt}
                     certificateID={course.certificateID}
                   />

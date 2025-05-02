@@ -18,4 +18,6 @@ Thumbs.db
 # Build directories
 dist/
 build/
+
+# Environment Variables
 .env

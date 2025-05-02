@@ -3,8 +3,7 @@ const router = express.Router();
 const Student = require('../../models/Student');
 const Course = require('../../models/Course');
 const jwt = require('jsonwebtoken');
-const { v4: uuidv4 } = require('uuid'); 
-
+const { v4: uuidv4 } = require('uuid');
 
 router.put('/', async (req, res) => {
   try {
@@ -21,7 +20,7 @@ router.put('/', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const student = await Student.findById(decoded.id);
-    
+
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -31,10 +30,10 @@ router.put('/', async (req, res) => {
       return res.status(404).json({ error: 'Course not found' });
     }
 
-    const hasAccess = student.ownedCourses.some(id => id.equals(courseId)) || 
-                      student.rentedCourses.some(rental => rental.course.equals(courseId) && 
-                      rental.expiryDate > new Date());
-    
+    const hasAccess = student.ownedCourses.some(id => id.equals(courseId)) ||
+      student.rentedCourses.some(rental => rental.course.equals(courseId) &&
+        rental.expiryDate > new Date());
+
     if (!hasAccess) {
       return res.status(403).json({ error: 'Student does not have access to this course' });
     }
@@ -47,38 +46,34 @@ router.put('/', async (req, res) => {
     let isFirstCourseCompletion = false;
 
     if (existingProgressIndex !== -1) {
-
       const progress = student.courseProgress[existingProgressIndex];
       const syllabusItemIndex = progress.syllabus.findIndex(item => item.S_no === S_no);
 
       if (syllabusItemIndex !== -1) {
-
         if (progress.syllabus[syllabusItemIndex].Status === 'Pending') {
-
           student.coins += 1;
           student.leaderboardPoints += 2;
-
           progress.syllabus[syllabusItemIndex].Status = 'Completed';
         }
       } else {
-
         progress.syllabus.push({
           S_no,
           title,
           Status: 'Completed'
         });
-        
+
         student.coins += 1;
         student.leaderboardPoints += 2;
         progress.syllabus.sort((a, b) => a.S_no - b.S_no);
       }
+
       const allCompleted = progress.syllabus.every(item => item.Status === 'Completed');
       const alreadyCompleted = student.completedCourses.some(c => c.course.equals(courseId));
 
       if (allCompleted && !alreadyCompleted) {
         isNewCompletion = true;
-
         isFirstCourseCompletion = student.completedCourses.length === 0;
+
         student.completedCourses.push({
           course: courseId,
           completedAt: new Date(),
@@ -108,7 +103,7 @@ router.put('/', async (req, res) => {
       if (course.syllabus.every(item => item.S_no <= S_no)) {
         isNewCompletion = true;
         isFirstCourseCompletion = student.completedCourses.length === 0;
-        
+
         student.completedCourses.push({
           course: courseId,
           completedAt: new Date(),
@@ -136,38 +131,46 @@ router.put('/', async (req, res) => {
     };
 
     if (isNewCompletion) {
+      const completedCourse = student.completedCourses.find(c => c.course.equals(courseId));
+
       response.courseCompleted = true;
-      response.certificateID = student.completedCourses.find(
-        c => c.course.equals(courseId)
-      ).certificateID;
-      
+      response.certificateID = completedCourse.certificateID;
+
       if (isFirstCourseCompletion) {
         response.badgeUnlocked = 'level4';
       }
+
+      response.certificateDetails = {
+        userName: student.username,
+        profileImage: student.profile?.image || null,
+        courseTitle: course.title,
+        courseCategory: course.category,
+        completionDate: completedCourse.completedAt,
+        certificateId: completedCourse.certificateID,
+      };
     }
 
     res.status(200).json(response);
-
   } catch (error) {
     console.error('Error updating progress:', error);
-    
+
     if (error.name === 'JsonWebTokenError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'Invalid token' 
+        error: 'Invalid token'
       });
     }
     if (error.name === 'TokenExpiredError') {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        error: 'Token expired' 
+        error: 'Token expired'
       });
     }
-    
-    res.status(500).json({ 
+
+    res.status(500).json({
       success: false,
-      error: 'Internal server error', 
-      details: error.message 
+      error: 'Internal server error',
+      details: error.message
     });
   }
 });

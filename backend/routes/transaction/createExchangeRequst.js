@@ -8,14 +8,14 @@ const ExchangeCode = require('../../models/ExchangeCode');
 router.post('/', async (req, res) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ error: 'Authorization token required' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const student = await Student.findById(decoded.id);
-    
+
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -25,19 +25,19 @@ router.post('/', async (req, res) => {
     if (!initiatorCode || !receiverCode) {
       return res.status(400).json({ error: 'Both initiatorCode and receiverCode are required' });
     }
-    const initiatorExchangeCode = await ExchangeCode.findOne({ 
+    const initiatorExchangeCode = await ExchangeCode.findOne({
       code: initiatorCode,
-      user: student._id 
+      user: student._id
     });
 
     if (!initiatorExchangeCode) {
-      return res.status(403).json({ 
-        error: 'The initiator code does not belong to you or is invalid' 
+      return res.status(403).json({
+        error: 'The initiator code does not belong to you or is invalid'
       });
     }
 
-    const receiverExchangeCode = await ExchangeCode.findOne({ 
-      code: receiverCode 
+    const receiverExchangeCode = await ExchangeCode.findOne({
+      code: receiverCode
     }).populate('user');
 
     if (!receiverExchangeCode) {
@@ -59,8 +59,8 @@ router.post('/', async (req, res) => {
     });
 
     if (existingRequest) {
-      return res.status(409).json({ 
-        error: 'You already have a pending exchange request with these codes' 
+      return res.status(409).json({
+        error: 'You already have a pending exchange request with these codes'
       });
     }
 
@@ -82,17 +82,17 @@ router.post('/', async (req, res) => {
 
   } catch (error) {
     console.error('Error creating exchange request:', error);
-    
+
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ success: false, error: 'Invalid or expired token' });
     }
-    
+
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ success: false, error: 'Token expired' });
     }
-    
-    res.status(500).json({ 
-      success: false, 
+
+    res.status(500).json({
+      success: false,
       error: 'An unexpected error occurred',
       details: process.env.NODE_ENV === 'development' ? error.message : undefined
     });

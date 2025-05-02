@@ -13,7 +13,7 @@ const CommunitySchema = new mongoose.Schema({
   messages: [{
     user: { type: mongoose.Schema.Types.ObjectId, refPath: 'messages.userType' },
     userType: { type: String, enum: ['Student', 'Creator'] },
-    userName: { type: String, required: true,},
+    userName: { type: String, required: true, },
     content: { type: String, required: true, maxlength: 1000 },
     createdAt: { type: Date, default: Date.now },
   }],

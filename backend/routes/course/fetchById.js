@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
-const Course = require('../../models/Course'); 
+const Course = require('../../models/Course');
 
 router.get('/:id', async (req, res) => {
   try {
     const courseId = req.params.id;
- 
+
     if (!mongoose.Types.ObjectId.isValid(courseId)) {
       return res.status(400).json({ error: 'Invalid course ID format' });
     }

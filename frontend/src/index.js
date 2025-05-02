@@ -16,6 +16,7 @@ import CreatorCommunity from './screens/creators/creatorCommunity';
 import Profile from './screens/profile';
 import SharableProfile from './screens/sharableProfile';
 import Home from './screens/Home'
+import Certificate from './screens/Certificate'
 import CretorSignup from './screens/creators/cretorSignup'
 import CreatorSignin from './screens/creators/creatorSignin'
 import CreaorDashboard from './screens/creators/CreaorDashboard'
@@ -43,6 +44,8 @@ root.render(
         <Route path="/CreaorDashboard" element={<CreaorDashboard />} />
         <Route path="/CreatorSignin" element={<CreatorSignin />} />
         <Route path="/CreateCourse" element={<CreateCourse />} />
+        <Route path="/Certificate/:id" element={<Certificate />} />
+
       </Routes>
     </Router>
   </React.StrictMode>

@@ -7,11 +7,11 @@ const Course = require('../../models/Course');
 router.get('/', async (req, res) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ error: 'Authorization token required' });
     }
-    
+
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const creator = await Creator.findById(decoded.id);
 
@@ -37,7 +37,7 @@ router.get('/', async (req, res) => {
         ])
       ])
     ]);
-    
+
 
     const response = {
       success: true,
@@ -54,7 +54,7 @@ router.get('/', async (req, res) => {
         stats: {
           totalCourses: stats[0],
           totalStudents: stats[1][0]?.total || 0,
-          averageRating: stats[2][0]?.average ? 
+          averageRating: stats[2][0]?.average ?
             Math.round(stats[2][0].average * 10) / 10 : 0
         }
       },
@@ -70,10 +70,10 @@ router.get('/', async (req, res) => {
     if (error.name === 'TokenExpiredError') {
       return res.status(401).json({ error: 'Token expired' });
     }
-    res.status(500).json({ 
+    res.status(500).json({
       success: false,
       message: 'Failed to fetch dashboard data',
-      error: error.message 
+      error: error.message
     });
   }
 });

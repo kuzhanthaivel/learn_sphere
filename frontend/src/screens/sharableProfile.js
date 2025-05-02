@@ -22,8 +22,6 @@ import level13 from '../assets/level13.png';
 import level14 from '../assets/level14.png';
 import level15 from '../assets/level15.png';
 import CoverImage1 from "../assets/CoverImage1.png";
-import CoverImage2 from "../assets/CoverImage2.png";
-import CoverImage3 from "../assets/CoverImage3.png";
 import Profile from "../assets/Profile.png";
 
 const CourseCard = ({ 
@@ -78,7 +76,7 @@ const CourseCard = ({
 export default function Page() {
   const { id } = useParams();
   const navigate = useNavigate();
-    const [selectedCourse, setSelectedCourse] = useState(null);
+  const [selectedCourse, setSelectedCourse] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -217,7 +215,7 @@ export default function Page() {
     }
     
     // Handle local file paths
-    const filename = imagePath.replace(/^.*[\\\/]/, '');
+    const filename = imagePath.replace(/^.*[\\]/, '');
     return `http://localhost:5001/uploads/${filename}`;
   };
   return (

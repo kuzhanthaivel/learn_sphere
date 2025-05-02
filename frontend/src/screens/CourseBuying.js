@@ -6,7 +6,8 @@ import { MdArrowBackIos } from "react-icons/md";
 import Syllabus from '../assets/syllabus.png';
 import { useParams, useNavigate } from 'react-router-dom';
 import { FaExclamationTriangle } from "react-icons/fa";
-  import { toast } from 'react-toastify';
+import { toast } from 'react-toastify';
+import { getContract } from "../contractIntegration/Transaction";
 
 export default function CourseBinding() {
   const { id } = useParams();
@@ -25,8 +26,8 @@ export default function CourseBinding() {
   const [error, setError] = useState(null);
   const [isPurchasing, setIsPurchasing] = useState(false);
   const [isRenting, setIsRenting] = useState(false);
+  const [blockchainLoading, setBlockchainLoading] = useState(false);
 
-  // Duration options with numeric day values
   const durationOptions = {
     "1 Day": { percentage: 5, coinsMultiplier: 10, days: 1 },
     "3 Days": { percentage: 8, coinsMultiplier: 16, days: 3 },
@@ -149,6 +150,11 @@ export default function CourseBinding() {
       return;
     }
 
+    if (!isConnected) {
+      toast.error("Please connect your wallet to complete the purchase");
+      return;
+    }
+
     setIsPurchasing(true);
     try {
       const finalPrice = courseData.price - ((courseData.price * courseData.discount) / 100);
@@ -171,10 +177,33 @@ export default function CourseBinding() {
         throw new Error(data.error || 'Purchase failed');
       }
 
+      setBlockchainLoading(true);
+      try {
+        const contract = getContract();
+        if (contract) {
+          const tx = await contract.addPayment(
+            data.data.transactionId,
+            walletAddress,
+            data.data.timestamp,
+            data.data.courseName,
+            data.data.courseCategory,
+            data.data.transactionType,
+            data.data.paymentMethod,
+            data.data.amount,
+            data.data.exchangeId
+          );
+          await tx.wait();
+          toast.success(`Purchase recorded on blockchain! TX Hash: ${tx.hash}`);
+        }
+      } catch (blockchainError) {
+        console.error("Blockchain transaction failed:", blockchainError);
+        toast.warning("Purchase completed but blockchain recording failed");
+      } finally {
+        setBlockchainLoading(false);
+      }
+
       toast.success('Course purchased successfully!');
-      console.log('Purchase response:', data);
-      
-      navigate('/dashboard')
+      navigate('/dashboard');
 
     } catch (error) {
       console.error('Purchase error:', error);
@@ -188,6 +217,11 @@ export default function CourseBinding() {
     if (!studentToken) {
       toast.error("Please login to rent the course");
       navigate('/signup');
+      return;
+    }
+
+    if (!isConnected) {
+      toast.error("Please connect your wallet to complete the rental");
       return;
     }
 
@@ -215,7 +249,7 @@ export default function CourseBinding() {
           paymentMethod: paymentMethod === 'coins' ? 'Coins' : 'Money',
           amount: paymentMethod === 'money' ? rentalCost : undefined,
           coinsVolume: paymentMethod === 'coins' ? coinsCost : undefined,
-          rentalDuration: durationOptions[duration].days // Send numeric days value
+          rentalDuration: durationOptions[duration].days
         })
       });
 
@@ -225,16 +259,39 @@ export default function CourseBinding() {
         throw new Error(data.error || 'Rental failed');
       }
 
-      toast.success(`Course rented for ${duration}! Access expires on ${new Date(data.rental.expiryDate).toLocaleDateString()}`);
-      console.log('Rental response:', data);
-      
+      setBlockchainLoading(true);
+      try {
+        const contract = getContract();
+        if (contract) {
+          const tx = await contract.addPayment(
+            data.data.transactionId,
+            walletAddress,
+            data.data.timestamp,
+            data.data.courseName,
+            data.data.courseCategory,
+            data.data.transactionType,
+            data.data.paymentMethod,
+            data.data.amount,
+            data.data.exchangeId
+          );
+          await tx.wait();
+          toast.success(`Rental recorded on blockchain! TX Hash: ${tx.hash}`);
+        }
+      } catch (blockchainError) {
+        console.error("Blockchain transaction failed:", blockchainError);
+        toast.warning("Rental completed but blockchain recording failed");
+      } finally {
+        setBlockchainLoading(false);
+      }
+
+      toast.success(`Course rented for ${duration}! Access expires on ${new Date(data.data.expiryDate).toLocaleDateString()}`);
       navigate('/dashboard');
 
     } catch (error) {
       console.error('Rental error:', error);
       if (error.name === 'JsonWebTokenError') {
         toast.error('Session expired. Please login again.');
-        navigate('/login');
+        navigate('/signin');
         return;
       }
       toast.error(error.message || 'Failed to rent course');
@@ -388,12 +445,13 @@ export default function CourseBinding() {
               </div>
               <button 
                 onClick={handlePurchase}
-                disabled={isPurchasing}
+                disabled={isPurchasing || blockchainLoading}
                 className={`w-full mt-5 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                  isPurchasing ? 'opacity-70 cursor-not-allowed' : ''
+                  isPurchasing || blockchainLoading ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
-                {isPurchasing ? 'Processing...' : 'Purchase Course'}
+                {isPurchasing ? 'Processing...' : 
+                 blockchainLoading ? 'Recording on blockchain...' : 'Purchase Course'}
               </button>
             </div>
           ) : (
@@ -459,12 +517,13 @@ export default function CourseBinding() {
 
               <button 
                 onClick={handleRent}
-                disabled={isRenting || !paymentMethod || !duration}
+                disabled={isRenting || blockchainLoading || !paymentMethod || !duration}
                 className={`w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                  isRenting || !paymentMethod || !duration ? 'opacity-70 cursor-not-allowed' : ''
+                  isRenting || blockchainLoading || !paymentMethod || !duration ? 'opacity-70 cursor-not-allowed' : ''
                 }`}
               >
-                {isRenting ? 'Processing...' : 'Rent Course'}
+                {isRenting ? 'Processing...' : 
+                 blockchainLoading ? 'Recording on blockchain...' : 'Rent Course'}
               </button>
             </div>
           )}

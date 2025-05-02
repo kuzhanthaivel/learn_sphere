@@ -23,17 +23,17 @@ router.post('/', async (req, res) => {
         if (!token) {
             return res.status(401).json({ error: 'Authorization token required' });
         }
-        
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
         let user = await Student.findById(decoded.id);
         let userType = 'Student';
         let username;
-        
+
         if (!user) {
             user = await Creator.findById(decoded.id);
             userType = 'Creator';
-            
+
             if (!user) {
                 return res.status(404).json({ error: 'User not found' });
             }
@@ -47,7 +47,7 @@ router.post('/', async (req, res) => {
             return res.status(404).json({ error: 'Community not found' });
         }
 
-        const isMember = community.members.some(member => 
+        const isMember = community.members.some(member =>
             member.user.equals(decoded.id) && member.userType === userType
         );
 

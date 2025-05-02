@@ -8,36 +8,36 @@ const StudentSchema = new mongoose.Schema({
   walletAddress: { type: String },
   coins: { type: Number, default: 0, min: 0 },
   ownedCourses: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Course' }],
-  completedCourses: { 
-    type: [{ 
+  completedCourses: {
+    type: [{
       course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
       completedAt: { type: Date, default: Date.now },
       certificateID: { type: String }
-    }], 
-    default: [] 
+    }],
+    default: []
   },
-  courseProgress: { 
-    type: [{ 
+  courseProgress: {
+    type: [{
       course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
       syllabus: [{
         S_no: Number,
         title: String,
-        Status:  { type: String, enum: ['Pending', 'Completed'], default: 'Pending' },
+        Status: { type: String, enum: ['Pending', 'Completed'], default: 'Pending' },
       }],
-    }], 
-    default: [] 
+    }],
+    default: []
   },
-  rentedCourses: { 
-    type: [{ 
+  rentedCourses: {
+    type: [{
       course: { type: mongoose.Schema.Types.ObjectId, ref: 'Course' },
       paymentMethod: { type: String, enum: ['coins', 'money'], required: true },
       amountPaid: { type: Number, required: true, min: 0 },
       durationDays: { type: Number, required: true, min: 1 },
       expiryDate: { type: Date, required: true },
       rentedAt: { type: Date, default: Date.now },
-      status: { type: String, enum: ['Available', 'Expired' ], default: 'Available' },
-    }], 
-    default: [] 
+      status: { type: String, enum: ['Available', 'Expired'], default: 'Available' },
+    }],
+    default: []
   },
   badges: {
     level1: { type: Boolean, default: false },

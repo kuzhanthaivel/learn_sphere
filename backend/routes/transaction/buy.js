@@ -12,15 +12,13 @@ const crypto = require('crypto');
 function generatePermanentCode(studentId, courseId) {
   const combined = `${studentId}${courseId}`;
   const hash = crypto.createHash('sha1').update(combined).digest('hex');
-  return hash.slice(0, 10).toUpperCase(); 
+  return hash.slice(0, 10).toUpperCase();
 }
 
-
 router.post('/', async (req, res) => {
-  
   const session = await mongoose.startSession();
   session.startTransaction();
-  
+
   try {
     const { courseId, amount } = req.body;
 
@@ -28,18 +26,18 @@ router.post('/', async (req, res) => {
     if (!token) {
       return res.status(401).json({ error: 'Authentication required' });
     }
-    
-    const decoded = jwt.verify(token, process.env.JWT_SECRET );
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const studentId = decoded.id;
 
     if (!courseId || !amount || isNaN(amount)) {
       await session.abortTransaction();
-      return res.status(400).json({ 
+      return res.status(400).json({
         error: 'Invalid input',
-        details: !courseId ? 'Missing courseId' : 
-                !amount ? 'Missing amount' : 'Amount must be a number'
+        details: !courseId ? 'Missing courseId' :
+          !amount ? 'Missing amount' : 'Amount must be a number'
       });
-          }
+    }
 
     const course = await Course.findById(courseId).session(session);
     if (!course) {
@@ -88,7 +86,7 @@ router.post('/', async (req, res) => {
       user: studentId,
       course: courseId,
       code: generatePermanentCode(studentId, courseId),
-      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000) 
+      expiresAt: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000)
     });
 
     const transaction = new Transaction({
@@ -100,6 +98,9 @@ router.post('/', async (req, res) => {
       status: 'Completed',
     });
 
+
+    console.log(transaction);
+
     await Promise.all([
       student.save({ session }),
       exchangeCode.save({ session }),
@@ -108,25 +109,29 @@ router.post('/', async (req, res) => {
 
     await session.commitTransaction();
 
+    const responseData = {
+      transactionId: transaction._id,
+      timestamp: transaction.createdAt,
+      courseName: course.title,
+      courseCategory: course.category || 'Uncategorized',
+      transactionType: 'Buy',
+      paymentMethod: 'Money',
+      amount: `₹${amount}`,
+      exchangeId: 'N/A'
+    };
+
     res.status(201).json({
       success: true,
-      data: {
-        transactionId: transaction._id,
-        course: course.title,
-        exchangeCode: exchangeCode.code,
-        coinsAdded: pointsAndCoins,
-        pointsAdded: pointsAndCoins,
-        badgesUpdated: isFirstCourse ? ['level2'] : []
-      }
+      data: responseData
     });
 
   } catch (error) {
-    await session.abortTransaction();;
-    
+    await session.abortTransaction();
+
     if (error.name === 'JsonWebTokenError') {
       return res.status(401).json({ error: 'Invalid token' });
     }
-    
+
     res.status(500).json({
       error: 'Purchase processing failed',
       details: error.message

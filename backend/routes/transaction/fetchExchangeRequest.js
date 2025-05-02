@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     const student = await Student.findById(decoded.id);
-    
+
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }

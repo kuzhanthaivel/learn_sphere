@@ -1,74 +1,62 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.0;
 
-contract Certificates {
+contract Certificate {
     struct Certificate {
-        bytes32 _id;
         address user;
         string userName;
-        string certificateId;
-        string courseName;
+        string profileImage;
+        string courseTitle;
         string courseCategory;
-        uint256 completedAt;
-        string creatorName;
+        string completionDate;
+        string certificateId;
     }
 
-    mapping(bytes32 => Certificate) public certificates;
-    mapping(string => bytes32) public certificateIdTo_hash; 
-    mapping(string => bool) public isCertificateIdUsed;
+    Certificate[] private certificates;
 
-    event CertificateIssued(
-        bytes32 indexed _id,
+    event CertificateAdded(
         address indexed user,
         string userName,
-        string certificateId,
-        string courseName,
+        string profileImage,
+        string courseTitle,
         string courseCategory,
-        uint256 completedAt,
-        string creatorName
+        string completionDate,
+        string certificateId
     );
 
-    function createCertificate(
-        address user,
-        string memory userName,
-        string memory certificateId,
-        string memory courseName,
-        string memory courseCategory,
-        string memory creatorName
+    function addCertificate(
+        address _user,
+        string memory _userName,
+        string memory _profileImage,
+        string memory _courseTitle,
+        string memory _courseCategory,
+        string memory _completionDate,
+        string memory _certificateId
     ) public {
-        require(!isCertificateIdUsed[certificateId], "Certificate ID already used");
-        
-        bytes32 _id = keccak256(abi.encodePacked(user, certificateId, block.timestamp));
-        
-        certificates[_id] = Certificate(
-            _id,
-            user,
-            userName,
-            certificateId,
-            courseName,
-            courseCategory,
-            block.timestamp,
-            creatorName
+        Certificate memory newCertificate = Certificate(
+            _user,
+            _userName,
+            _profileImage,
+            _courseTitle,
+            _courseCategory,
+            _completionDate,
+            _certificateId
         );
 
-        certificateIdTo_hash[certificateId] = _id;
-        isCertificateIdUsed[certificateId] = true;
+        certificates.push(newCertificate);
 
-        emit CertificateIssued(
-            _id,
-            user,
-            userName,
-            certificateId,
-            courseName,
-            courseCategory,
-            block.timestamp,
-            creatorName
+        emit CertificateAdded(
+            _user,
+            _userName,
+            _profileImage,
+            _courseTitle,
+            _courseCategory,
+            _completionDate,
+            _certificateId
         );
     }
 
-    function viewCertificateById(string memory certificateId) public view returns (Certificate memory) {
-        require(isCertificateIdUsed[certificateId], "Certificate does not exist");
-        bytes32 _id = certificateIdTo_hash[certificateId];
-        return certificates[_id];
+    function getAllCertificates() public view returns (Certificate[] memory) {
+        return certificates;
     }
 }

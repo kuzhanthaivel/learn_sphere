@@ -6,7 +6,7 @@ const ExchangeRequestSchema = new mongoose.Schema({
   receiver: { type: mongoose.Schema.Types.ObjectId, ref: 'Student', required: true },
   initiatorCode: { type: String, required: true },
   receiverCode: { type: String },
-  status: { type: String, enum: ['Canceled', 'Accepted', 'notResponded' ], default: 'notResponded' },
+  status: { type: String, enum: ['Canceled', 'Accepted', 'notResponded'], default: 'notResponded' },
   createdAt: { type: Date, default: Date.now },
   completedAt: { type: Date }
 });

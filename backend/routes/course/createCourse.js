@@ -52,9 +52,9 @@ const uploadCoverImage = multer({
 
 const uploadVideo = multer({
   storage: videoStorage,
-  limits: { fileSize: 1024 * 1024 * 100 }, 
+  limits: { fileSize: 1024 * 1024 * 100 },
   fileFilter: videoFilter,
-}).array('syllabusVideos', 10); 
+}).array('syllabusVideos', 10);
 
 const verifyCreatorToken = (token) => {
   try {
@@ -68,37 +68,37 @@ router.post('/', async (req, res) => {
 
   uploadCoverImage(req, res, async (err) => {
     if (err) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: err.message 
+        message: err.message
       });
     }
 
     const token = req.headers['authorization']?.split(' ')[1];
     if (!token) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'No token provided' 
+        message: 'No token provided'
       });
     }
 
     const decoded = verifyCreatorToken(token);
     if (!decoded) {
-      return res.status(401).json({ 
+      return res.status(401).json({
         success: false,
-        message: 'Invalid or expired token' 
+        message: 'Invalid or expired token'
       });
     }
 
     const creator = await Creator.findById(decoded.id);
     if (!creator) {
-      return res.status(404).json({ 
+      return res.status(404).json({
         success: false,
-        message: 'Creator not found' 
+        message: 'Creator not found'
       });
     }
 
-    const { 
+    const {
       title,
       shortDescription,
       fullDescription,
@@ -111,9 +111,9 @@ router.post('/', async (req, res) => {
     } = req.body;
 
     if (!title || !shortDescription || !fullDescription || !category || !price) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Missing required fields' 
+        message: 'Missing required fields'
       });
     }
 
@@ -121,24 +121,24 @@ router.post('/', async (req, res) => {
     try {
       syllabusArray = Array.isArray(syllabus) ? syllabus : JSON.parse(syllabus || '[]');
     } catch (e) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'Invalid syllabus format' 
+        message: 'Invalid syllabus format'
       });
     }
 
     if (!syllabusArray.length) {
-      return res.status(400).json({ 
+      return res.status(400).json({
         success: false,
-        message: 'At least one syllabus item is required' 
+        message: 'At least one syllabus item is required'
       });
     }
 
     for (const item of syllabusArray) {
       if (!item.title || (!item.videoUrl && !item.videoFile)) {
-        return res.status(400).json({ 
+        return res.status(400).json({
           success: false,
-          message: 'Each syllabus item must have a title and either videoUrl or videoFile' 
+          message: 'Each syllabus item must have a title and either videoUrl or videoFile'
         });
       }
     }
@@ -233,10 +233,10 @@ router.post('/', async (req, res) => {
 
     } catch (error) {
       console.error('Error creating course:', error);
-      return res.status(500).json({ 
+      return res.status(500).json({
         success: false,
         message: 'Error creating course',
-        error: error.message 
+        error: error.message
       });
     }
   });

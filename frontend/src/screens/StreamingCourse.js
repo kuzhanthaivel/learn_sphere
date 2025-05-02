@@ -1,10 +1,12 @@
-import Navbar from "../components/Header";
 import { useState, useEffect } from "react";
+import { useParams, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { getCertificateContract } from "../contractIntegration/Certificates";
+import Navbar from "../components/Header";
 import Footer from "../components/footer";
 import { MdArrowBackIos } from "react-icons/md";
 import Syllabus from '../assets/syllabus.png';
-import { useParams, useNavigate } from 'react-router-dom';
-import Image from '../assets/CoverImage1.png'
+import Image from '../assets/CoverImage1.png';
 
 export default function StreamingCourse() {
   const [checked, setChecked] = useState([]);
@@ -16,6 +18,61 @@ export default function StreamingCourse() {
   const { id } = useParams();
   const navigate = useNavigate();
   const studentToken = localStorage.getItem('studentToken');
+  const [walletAddress, setWalletAddress] = useState("");
+  const [isConnected, setIsConnected] = useState(false);
+  const [blockchainLoading, setBlockchainLoading] = useState(false);
+  const [certificateDetails, setCertificateDetails] = useState(null);
+
+  const checkWalletConnection = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+          setIsConnected(true);
+        }
+      } catch (error) {
+        console.error("Error checking wallet connection:", error);
+      }
+    }
+  };
+
+  const connectWallet = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+        setWalletAddress(accounts[0]);
+        setIsConnected(true);
+        
+        window.ethereum.on('accountsChanged', (newAccounts) => {
+          if (newAccounts.length > 0) {
+            setWalletAddress(newAccounts[0]);
+          } else {
+            setWalletAddress("");
+            setIsConnected(false);
+          }
+        });
+        
+        window.ethereum.on('chainChanged', () => {
+          window.location.reload();
+        });
+        
+      } catch (error) {
+        console.error("User rejected request:", error);
+        if (error.code === 4001) {
+          toast.error("Please connect to MetaMask to continue.");
+        }
+      }
+    } else {
+      toast.error("MetaMask is not installed. Please install it to use this feature.");
+      window.open('https://metamask.io/download.html', '_blank');
+    }
+  };
+
+  const disconnectWallet = () => {
+    setWalletAddress("");
+    setIsConnected(false);
+  };
 
   const fetchCompletedSyllabus = async () => {
     try {
@@ -25,24 +82,18 @@ export default function StreamingCourse() {
           'Authorization': `Bearer ${studentToken}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({
-          courseId: id
-        })
+        body: JSON.stringify({ courseId: id })
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to fetch course progress');
-      }
+      if (!response.ok) throw new Error('Failed to fetch course progress');
 
       const data = await response.json();
-      if (data.courseProgress && data.courseProgress.syllabus) {
+      if (data.courseProgress?.syllabus) {
         const completedItems = data.courseProgress.syllabus
           .filter(item => item.Status === "Completed")
           .map(item => item.S_no);
         setChecked(completedItems);
-        const allCompleted = data.courseProgress.syllabus.every(item => item.Status === "Completed");
-        setCourseCompleted(allCompleted);
+        setCourseCompleted(data.courseProgress.syllabus.every(item => item.Status === "Completed"));
       }
     } catch (error) {
       console.error('Error fetching completed syllabus:', error);
@@ -50,13 +101,11 @@ export default function StreamingCourse() {
   };
 
   useEffect(() => {
+    checkWalletConnection();
     const fetchCourseData = async () => {
       try {
         const response = await fetch(`http://localhost:5001/api/StreamCourse/${id}`, {
-          headers: {
-            'Authorization': `Bearer ${studentToken}`,
-            'Content-Type': 'application/json'
-          }
+          headers: { 'Authorization': `Bearer ${studentToken}` }
         });
 
         if (!response.ok) {
@@ -66,15 +115,14 @@ export default function StreamingCourse() {
 
         const data = await response.json();
         setCourseData(data);
-        
         await fetchCompletedSyllabus();
 
-        if (data.syllabus && data.syllabus.length > 0) {
+        if (data.syllabus?.length > 0) {
           setCurrentVideo(data.syllabus[0]);
         }
       } catch (err) {
         setError(err.message);
-        if (err.message.includes('Authorization') || err.message.includes('token')) {
+        if (err.message.includes('Authorization')) {
           navigate('/signin');
         } else if (err.message.includes('access')) {
           navigate(`/CourseBuying/${id}`);
@@ -84,9 +132,8 @@ export default function StreamingCourse() {
       }
     };
 
-    if (studentToken) {
-      fetchCourseData();
-    } else {
+    if (studentToken) fetchCourseData();
+    else {
       setError('You need to log in to view this course');
       setLoading(false);
       navigate('/signin');
@@ -94,10 +141,8 @@ export default function StreamingCourse() {
   }, [id, studentToken, navigate]);
 
   const handleToggle = async (item) => {
-    if (checked.includes(item.S_no)) {
-      return;
-    }
-  
+    if (checked.includes(item.S_no)) return;
+
     try {
       const response = await fetch('http://localhost:5001/api/student/update-progress', {
         method: 'PUT',
@@ -111,28 +156,66 @@ export default function StreamingCourse() {
           title: item.title
         })
       });
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to update progress');
       }
-  
+
       const result = await response.json();
-      
       setChecked(prev => [...prev, item.S_no]);
 
-      if (courseData?.syllabus?.every(syllabusItem => 
-        [...checked, item.S_no].includes(syllabusItem.S_no)
-      )) {
+      // Check if course was just completed
+      if (result.courseCompleted) {
         setCourseCompleted(true);
-        alert('Congratulations! You have completed the entire course!');
+        setCertificateDetails(result.certificateDetails);
+        toast.success('Congratulations! You have completed the course!');
+
+        // Only proceed with blockchain if wallet is connected
+        if (isConnected) {
+          await mintCertificateOnBlockchain(result.certificateDetails);
+        }
       }
     } catch (error) {
       console.error('Error updating progress:', error);
-      alert('Failed to update progress: ' + error.message);
+      toast.error('Failed to update progress: ' + error.message);
     }
   };
 
+  const mintCertificateOnBlockchain = async (details) => {
+    if (!details || !isConnected) return;
+
+    setBlockchainLoading(true);
+    try {
+      const contract = await getCertificateContract();
+      if (!contract) throw new Error("Failed to connect to blockchain");
+
+      const tx = await contract.addCertificate(
+        walletAddress,
+        details.userName,
+        details.profileImage || '',
+        details.courseTitle,
+        details.courseCategory,
+        Math.floor(new Date(details.completionDate).getTime() / 1000),
+        details.certificateId
+      );
+
+      await tx.wait();
+      toast.success(`Certificate minted on blockchain! TX Hash: ${tx.hash}`);
+    } catch (error) {
+      console.error("Blockchain transaction failed:", error);
+      toast.warning("Certificate generated but not recorded on blockchain");
+    } finally {
+      setBlockchainLoading(false);
+    }
+  };
+
+  // View certificate handler
+  const handleViewCertificate = () => {
+    if (certificateDetails) {
+      navigate(`/certificate/${certificateDetails.certificateId}`);
+    }
+  };
   const extractYouTubeID = (url) => {
     if (!url) return null;
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
@@ -213,7 +296,7 @@ export default function StreamingCourse() {
             {currentVideo?.videoUrl && extractYouTubeID(currentVideo.videoUrl) ? (
               <iframe
                 className="w-full h-[400px]"
-                src={`https://www.youtube.com/embed/${extractYouTubeID(currentVideo.videoUrl)}?modestbranding=0&controls=0`}
+                src={`https://www.youtube.com/embed/${extractYouTubeID(currentVideo.videoUrl)}?modestbranding=1&controls=1`}
                 title={currentVideo.title}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -233,6 +316,7 @@ export default function StreamingCourse() {
             )}
           </div>
           <div className="bg-white p-4 rounded-xl shadow-md">
+            <h2 className="text-xl font-bold mb-2">{currentVideo?.title || 'Course Content'}</h2>
             <p className="text-sm text-gray-600 font-semibold">
               {courseData.shortDescription}
             </p>
@@ -241,67 +325,108 @@ export default function StreamingCourse() {
             </p>
           </div>
         </div>
-        <div className="bg-white p-4 rounded-xl shadow-md w-[350px]">
-          <div className="flex items-center space-x-2">
-            <img src={Syllabus} alt="Learn Sphere" className="w-60" />
+
+
+        <div className="bg-white p-4 rounded-xl shadow-md w-full lg:w-[350px]">
+
+        <div className="mt-4 border-t pt-4">
+          {isConnected ? (
+                        <div className="mb-4 w-full ">
+                          <div className="px-3 h-12 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
+                            <span className="text-sm font-medium text-green-800 truncate">
+                              {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
+                            </span>
+                            <button 
+                              onClick={disconnectWallet}
+                              className="text-xs text-red-500 hover:text-red-700"
+                            >
+                              Disconnect
+                            </button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button 
+                          onClick={connectWallet}
+                          className="px-3 mb-4 h-12 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
+                        >
+                          Connect Wallet
+                        </button>
+                      )}
+          </div>
+          <div className="flex items-center space-x-2 mb-4">
+            <img src={Syllabus} alt="Syllabus" className="w-56" />
           </div>
 
-          <ul className="space-y-2">
+          <ul className="space-y-2 max-h-[400px] overflow-y-auto">
             {courseData.syllabus.map((item) => (
-              <li
-                key={item.S_no}
-                className={`flex border-t items-center gap-2 p-2 rounded-md hover:bg-gray-100 ${
-                  checked.includes(item.S_no) ? "bg-blue-100" : ""
-                }`}
-              >
+              <li key={item.S_no} className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 transition-colors ${
+                checked.includes(item.S_no) ? "bg-blue-50" : ""
+              } ${currentVideo?.S_no === item.S_no ? "border-l-4 border-[#20B486]" : ""}`}>
                 <input
                   type="checkbox"
                   checked={checked.includes(item.S_no)}
                   onChange={() => handleToggle(item)}
-                  id={`syllabus-${item.S_no}`}
-                  disabled={checked.includes(item.S_no)}
+                  disabled={checked.includes(item.S_no) || blockchainLoading}
+                  className="h-4 w-4 rounded border-gray-300 text-[#20B486] focus:ring-[#20B486]"
                 />
                 <label 
                   htmlFor={`syllabus-${item.S_no}`} 
-                  className="cursor-pointer"
+                  className="cursor-pointer flex-1"
                   onClick={() => setCurrentVideo(item)}
                 >
-                  {item.title}
+                  <span className="font-medium">{item.S_no}. {item.title}</span>
                 </label>
               </li>
             ))}
           </ul>
+          
           {courseCompleted && (
-            <div className="mt-4 p-3 bg-green-100 text-green-800 rounded-lg text-center">
-              You've completed this course!
+            <div className="mt-4 space-y-3">
+              <div className="p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg">
+                <p className="font-semibold">Course Completed!</p>
+                <p className="text-sm mt-1">You can now exchange this course</p>
+                {certificateDetails && (
+                  <button 
+                    onClick={handleViewCertificate}
+                    className="mt-2 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
+                  >
+                    View Certificate
+                  </button>
+                )}
+              </div>
+
+              {!isConnected && (
+                <div className="p-3 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-lg">
+                  <p className="text-sm">Connect your wallet to mint a blockchain certificate</p>
+                </div>
+              )}
+
+              {blockchainLoading && (
+                <div className="p-2 bg-blue-50 text-blue-800 text-sm rounded-lg text-center">
+                  Processing blockchain transaction...
+                </div>
+              )}
             </div>
           )}
-<div className="relative mt-9">
-  <button 
-    className={`w-full py-2 rounded transition-colors ${
-      courseData.rentedCourse || !courseCompleted
-        ? 'bg-gray-400 cursor-not-allowed text-gray-600' 
-        : 'bg-green-500 hover:bg-green-600 text-white'
-    }`}
-    disabled={courseData.rentedCourse || !courseCompleted}
-    onClick={() => {
-      navigate(`/CourseExchange/${id}`);
-      console.log('Exchange initiated for course:', id);
-    }}
-  >
-    {courseData.rentedCourse 
-      ? 'Already Rented' 
-      : courseCompleted 
-        ? 'Exchange' 
-        : 'Complete Course to Exchange'}
-  </button>
-  
-  {!courseData.rentedCourse && !courseCompleted && (
-    <div className="absolute -top-8 left-0 bg-gray-800 text-white text-xs px-2 py-1 rounded whitespace-nowrap">
-      Complete all lessons to exchange this course
-    </div>
-  )}
-</div>
+
+          <div className="mt-4">
+            <button 
+              className={`w-full py-2 rounded transition-colors mb-3 ${
+                courseData.rentedCourse || !courseCompleted
+                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+                  : 'bg-[#20B486] hover:bg-[#1a9c72] text-white'
+              }`}
+              disabled={courseData.rentedCourse || !courseCompleted}
+              onClick={() => navigate(`/CourseExchange/${id}`)}
+            >
+              {courseData.rentedCourse 
+                ? 'Already Rented' 
+                : courseCompleted 
+                  ? 'Exchange Course' 
+                  : 'Complete Course to Exchange'}
+            </button>
+          </div>
+
         </div>
       </div>
       <Footer />

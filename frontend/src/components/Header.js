@@ -67,7 +67,7 @@ const Navbar = () => {
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
       return imagePath;
     }
-    const filename = imagePath.replace(/^.*[\\\/]/, '');
+    const filename = imagePath.replace(/^.*[\\]/, '');
     
     return `http://localhost:5001/uploads/${filename}`;
   };

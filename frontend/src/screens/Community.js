@@ -239,8 +239,8 @@ const CommunityChat = () => {
         <button className="text-green-500 text-xl hover:bg-gray-700 p-2 rounded-lg transition">
             <RiCommunityLine/>    
         </button>
-        <button className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-        <a href="/"> <FaHome/> </a>    
+        <button onClick={() => navigate(-1)} className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
+     <FaHome/>
         </button>
       </aside>
 

@@ -8,14 +8,14 @@ const Course = require('../../models/Course');
 router.get('/', async (req, res) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    
+
     if (!token) {
       return res.status(401).json({ error: 'Authorization token required' });
     }
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    const student = await Student.findById(decoded.id);
-    
+    const student = await Student.findById(decoded.id).select('username');
+
     if (!student) {
       return res.status(404).json({ error: 'Student not found' });
     }
@@ -33,6 +33,7 @@ router.get('/', async (req, res) => {
 
     const formattedTransactions = transactions.map(transaction => ({
       transactionId: transaction._id,
+      UserName: student.username,
       timestamp: transaction.createdAt,
       courseName: transaction.course?.title || 'N/A',
       courseCategory: transaction.course?.category || 'N/A',
@@ -42,6 +43,7 @@ router.get('/', async (req, res) => {
       exchangeId: transaction.exchangeData?._id.toString() || 'N/A'
     }));
 
+    console.log(formattedTransactions);
     res.json(formattedTransactions);
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {

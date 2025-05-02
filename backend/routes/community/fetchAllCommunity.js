@@ -8,20 +8,20 @@ const Community = require('../../models/Community');
 router.get('/', async (req, res) => {
     try {
         const token = req.header('Authorization')?.replace('Bearer ', '');
-        
+
         if (!token) {
             return res.status(401).json({ error: 'Authorization token required' });
         }
-        
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        
+
         let user = await Student.findById(decoded.id).select('communities');
         let userType = 'Student';
-        
+
         if (!user) {
             user = await Creator.findById(decoded.id).select('communities');
             userType = 'Creator';
-            
+
             if (!user) {
                 return res.status(404).json({ error: 'User not found in either Student or Creator models' });
             }
@@ -30,8 +30,8 @@ router.get('/', async (req, res) => {
         const communities = await Community.find({
             _id: { $in: user.communities }
         })
-        .select('name members') 
-        .lean();
+            .select('name members')
+            .lean();
 
         const formattedCommunities = communities.map(community => ({
             _id: community._id,
