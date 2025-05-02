@@ -177,7 +177,7 @@ const contractABI = [
 	}
 ]
 
-const contractAddress = "0xc9890272b245158f2d962c0e293d0e63dd2a1494";
+const contractAddress = "0xb6ed290c0882233c20d8993b7c06c3511750a72b";
 
 export const getContract = () => {
 	if (!window.ethereum) {
