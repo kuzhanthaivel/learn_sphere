@@ -6,16 +6,16 @@ import CoverImage1 from "../../assets/CoverImage1.png";
 
 const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:5001';
 
-const CourseCard = ({ 
+const CourseCard = ({
   id,
-  category, 
-  coverImage, 
-  title, 
+  category,
+  coverImage,
+  title,
   students,
   rating,
   onDelete
 }) => {
-  const imageUrl = coverImage 
+  const imageUrl = coverImage
     ? `http://localhost:5001/${coverImage.replace(/\\/g, '/')}`
     : CoverImage1;
   return (
@@ -24,10 +24,10 @@ const CourseCard = ({
         <div className="absolute bg-white left-1 top-1 px-2 py-1 rounded-lg bg-opacity-50">
           {category}
         </div>
-        <img 
-          src={imageUrl} 
-          className="w-full h-32 object-cover" 
-          alt={`${title} course cover`} 
+        <img
+          src={imageUrl}
+          className="w-full h-32 object-cover"
+          alt={`${title} course cover`}
           onError={(e) => {
             e.target.src = CoverImage1;
           }}
@@ -59,7 +59,7 @@ const CourseCard = ({
               onDelete(id);
             }}
           />
-        </div> 
+        </div>
       </div>
     </div>
   );
@@ -71,7 +71,7 @@ export default function CreatorDashboard() {
   const [stats, setStats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   const coursesPerPage = 4;
 
   useEffect(() => {
@@ -94,7 +94,7 @@ export default function CreatorDashboard() {
         }
 
         const data = await response.json();
-        
+
         if (data.success) {
           const transformedCourses = data.data.courses.map(course => ({
             id: course.courseId,
@@ -106,21 +106,21 @@ export default function CreatorDashboard() {
           }));
 
           const transformedStats = [
-            { 
-              title: "Total Students", 
-              value: data.data.stats.totalStudents.toLocaleString(), 
-              icon: <FaUsers className="text-2xl" />, 
+            {
+              title: "Total Students",
+              value: data.data.stats.totalStudents.toLocaleString(),
+              icon: <FaUsers className="text-2xl" />,
               color: "bg-blue-100 text-blue-600"
             },
-            { 
-              title: "Average Rating", 
-              value: data.data.stats.averageRating, 
+            {
+              title: "Average Rating",
+              value: data.data.stats.averageRating,
               icon: <FaStar className="text-2xl" />,
               color: "bg-yellow-100 text-yellow-600"
             },
-            { 
-              title: "Courses Published", 
-              value: data.data.stats.totalCourses, 
+            {
+              title: "Courses Published",
+              value: data.data.stats.totalCourses,
               icon: <BsArrowUpRightSquareFill className="text-2xl" />,
               color: "bg-green-100 text-green-600"
             }
@@ -215,7 +215,7 @@ export default function CreatorDashboard() {
           <div className="bg-white p-6 rounded-lg shadow">
             <div className="flex flex-col md:flex-row justify-between items-center mb-6">
               <h2 className="text-xl font-bold mb-4 md:mb-0">Your Courses</h2>
-              <button 
+              <button
                 className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
                 onClick={handleCreateNewCourse}
               >
@@ -288,7 +288,7 @@ export default function CreatorDashboard() {
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-500 mb-4">You haven't created any courses yet</p>
-                <button 
+                <button
                   className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center mx-auto"
                   onClick={handleCreateNewCourse}
                 >

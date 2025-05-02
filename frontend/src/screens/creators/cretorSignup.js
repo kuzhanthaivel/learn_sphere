@@ -63,7 +63,7 @@ export default function CreatorSignup() {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
+
     if (name.startsWith('socialLinks.')) {
       const socialMedia = name.split('.')[1];
       setFormData(prev => ({
@@ -90,27 +90,27 @@ export default function CreatorSignup() {
 
   const validateForm = () => {
     const newErrors = {};
-    
+
     if (!formData.professionalName.trim()) {
       newErrors.professionalName = 'Professional name is required';
     }
-    
+
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^\S+@\S+\.\S+$/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
     }
-    
+
     if (!formData.password) {
       newErrors.password = 'Password is required';
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
     }
-    
+
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-    
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -118,9 +118,9 @@ export default function CreatorSignup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
-    
+
     setIsSubmitting(true);
-    
+
     try {
       const formDataToSend = new FormData();
       formDataToSend.append('professionalName', formData.professionalName);
@@ -129,22 +129,22 @@ export default function CreatorSignup() {
       formDataToSend.append('walletAddress', formData.walletAddress);
       formDataToSend.append('bio', formData.bio);
       formDataToSend.append('socialLinks', JSON.stringify(formData.socialLinks));
-      
+
       if (profileImage) {
         formDataToSend.append('image', profileImage);
       }
-      
+
       const response = await fetch('http://localhost:5001/api/creators/signup', {
         method: 'POST',
         body: formDataToSend
       });
-      
+
       const data = await response.json();
-      
+
       if (!response.ok) {
         throw new Error(data.error || 'Signup failed');
       }
-      
+
       navigate('/CreatorSignin');
     } catch (error) {
       console.error('Signup error:', error.message);
@@ -160,21 +160,21 @@ export default function CreatorSignup() {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
 
-<Navbar/>
+      <Navbar />
       <div className="flex-1 flex items-center justify-center py-8 px-4">
         <div className="w-full max-w-4xl">
           <div className="bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="bg-gradient-to-r from-blue-600 to-indigo-700 px-6 py-4">
               <h1 className="text-2xl font-bold text-white">Creator Sign Up</h1>
             </div>
-            
+
             <div className="p-6">
               {errors.apiError && (
                 <div className="bg-red-50 text-red-600 text-sm p-3 rounded mb-4">
                   {errors.apiError}
                 </div>
               )}
-              
+
               <form onSubmit={handleSubmit}>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div className="space-y-4">
@@ -287,12 +287,12 @@ export default function CreatorSignup() {
                             </p>
                             <p className="text-xs text-gray-500">PNG, JPG (MAX. 5MB)</p>
                           </div>
-                          <input 
-                            type="file" 
+                          <input
+                            type="file"
                             name="profileImage"
                             onChange={handleImageChange}
                             accept="image/*"
-                            className="hidden" 
+                            className="hidden"
                           />
                         </label>
                       </div>

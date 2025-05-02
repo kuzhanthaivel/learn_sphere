@@ -43,7 +43,7 @@ export default function StreamingCourse() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setIsConnected(true);
-        
+
         window.ethereum.on('accountsChanged', (newAccounts) => {
           if (newAccounts.length > 0) {
             setWalletAddress(newAccounts[0]);
@@ -52,11 +52,11 @@ export default function StreamingCourse() {
             setIsConnected(false);
           }
         });
-        
+
         window.ethereum.on('chainChanged', () => {
           window.location.reload();
         });
-        
+
       } catch (error) {
         console.error("User rejected request:", error);
         if (error.code === 4001) {
@@ -165,13 +165,11 @@ export default function StreamingCourse() {
       const result = await response.json();
       setChecked(prev => [...prev, item.S_no]);
 
-      // Check if course was just completed
       if (result.courseCompleted) {
         setCourseCompleted(true);
         setCertificateDetails(result.certificateDetails);
         toast.success('Congratulations! You have completed the course!');
 
-        // Only proceed with blockchain if wallet is connected
         if (isConnected) {
           await mintCertificateOnBlockchain(result.certificateDetails);
         }
@@ -210,7 +208,6 @@ export default function StreamingCourse() {
     }
   };
 
-  // View certificate handler
   const handleViewCertificate = () => {
     if (certificateDetails) {
       navigate(`/certificate/${certificateDetails.certificateId}`);
@@ -259,7 +256,7 @@ export default function StreamingCourse() {
     );
   }
 
-  const imageUrl = courseData.coverImage 
+  const imageUrl = courseData.coverImage
     ? `http://localhost:5001/${courseData.coverImage.replace(/\\/g, '/')}`
     : Image;
 
@@ -268,13 +265,13 @@ export default function StreamingCourse() {
       <Navbar />
       <div className="py-5 px-6">
         <div className="flex items-center space-x-2 text-[#20B486] font-semibold text-xl mb-6">
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="border border-gray-200 py-2 pl-3 pr-1 rounded-xl cursor-pointer text-black text-center"
           >
             <MdArrowBackIos />
           </button>
-          <span>{courseData.title}</span> 
+          <span>{courseData.title}</span>
           {courseCompleted && (
             <span className="bg-green-500 text-white text-sm py-1 px-3 rounded-full">
               Completed
@@ -282,7 +279,7 @@ export default function StreamingCourse() {
           )}
           <span className="border text-gray-700 text-sm py-2 px-4 border-gray-700 rounded-lg">
             {courseData.category}
-          </span> 
+          </span>
           {courseData.rentedCourse && (
             <span className="text-sm text-orange-500">
               (Rental expires: {new Date(courseData.expiryDate).toLocaleDateString()})
@@ -329,29 +326,29 @@ export default function StreamingCourse() {
 
         <div className="bg-white p-4 rounded-xl shadow-md w-full lg:w-[350px]">
 
-        <div className="mt-4 border-t pt-4">
-          {isConnected ? (
-                        <div className="mb-4 w-full ">
-                          <div className="px-3 h-12 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
-                            <span className="text-sm font-medium text-green-800 truncate">
-                              {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
-                            </span>
-                            <button 
-                              onClick={disconnectWallet}
-                              className="text-xs text-red-500 hover:text-red-700"
-                            >
-                              Disconnect
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <button 
-                          onClick={connectWallet}
-                          className="px-3 mb-4 h-12 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
-                        >
-                          Connect Wallet
-                        </button>
-                      )}
+          <div className="mt-4 border-t pt-4">
+            {isConnected ? (
+              <div className="mb-4 w-full ">
+                <div className="px-3 h-12 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
+                  <span className="text-sm font-medium text-green-800 truncate">
+                    {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
+                  </span>
+                  <button
+                    onClick={disconnectWallet}
+                    className="text-xs text-red-500 hover:text-red-700"
+                  >
+                    Disconnect
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={connectWallet}
+                className="px-3 mb-4 h-12 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
+              >
+                Connect Wallet
+              </button>
+            )}
           </div>
           <div className="flex items-center space-x-2 mb-4">
             <img src={Syllabus} alt="Syllabus" className="w-56" />
@@ -359,9 +356,8 @@ export default function StreamingCourse() {
 
           <ul className="space-y-2 max-h-[400px] overflow-y-auto">
             {courseData.syllabus.map((item) => (
-              <li key={item.S_no} className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 transition-colors ${
-                checked.includes(item.S_no) ? "bg-blue-50" : ""
-              } ${currentVideo?.S_no === item.S_no ? "border-l-4 border-[#20B486]" : ""}`}>
+              <li key={item.S_no} className={`flex items-center gap-3 p-2 rounded-md hover:bg-gray-100 transition-colors ${checked.includes(item.S_no) ? "bg-blue-50" : ""
+                } ${currentVideo?.S_no === item.S_no ? "border-l-4 border-[#20B486]" : ""}`}>
                 <input
                   type="checkbox"
                   checked={checked.includes(item.S_no)}
@@ -369,8 +365,8 @@ export default function StreamingCourse() {
                   disabled={checked.includes(item.S_no) || blockchainLoading}
                   className="h-4 w-4 rounded border-gray-300 text-[#20B486] focus:ring-[#20B486]"
                 />
-                <label 
-                  htmlFor={`syllabus-${item.S_no}`} 
+                <label
+                  htmlFor={`syllabus-${item.S_no}`}
                   className="cursor-pointer flex-1"
                   onClick={() => setCurrentVideo(item)}
                 >
@@ -379,14 +375,14 @@ export default function StreamingCourse() {
               </li>
             ))}
           </ul>
-          
+
           {courseCompleted && (
             <div className="mt-4 space-y-3">
               <div className="p-3 bg-green-50 border border-green-200 text-green-800 rounded-lg">
                 <p className="font-semibold">Course Completed!</p>
                 <p className="text-sm mt-1">You can now exchange this course</p>
                 {certificateDetails && (
-                  <button 
+                  <button
                     onClick={handleViewCertificate}
                     className="mt-2 w-full py-2 bg-blue-600 hover:bg-blue-700 text-white rounded transition-colors"
                   >
@@ -410,19 +406,18 @@ export default function StreamingCourse() {
           )}
 
           <div className="mt-4">
-            <button 
-              className={`w-full py-2 rounded transition-colors mb-3 ${
-                courseData.rentedCourse || !courseCompleted
-                  ? 'bg-gray-300 cursor-not-allowed text-gray-500' 
+            <button
+              className={`w-full py-2 rounded transition-colors mb-3 ${courseData.rentedCourse || !courseCompleted
+                  ? 'bg-gray-300 cursor-not-allowed text-gray-500'
                   : 'bg-[#20B486] hover:bg-[#1a9c72] text-white'
-              }`}
+                }`}
               disabled={courseData.rentedCourse || !courseCompleted}
               onClick={() => navigate(`/CourseExchange/${id}`)}
             >
-              {courseData.rentedCourse 
-                ? 'Already Rented' 
-                : courseCompleted 
-                  ? 'Exchange Course' 
+              {courseData.rentedCourse
+                ? 'Already Rented'
+                : courseCompleted
+                  ? 'Exchange Course'
                   : 'Complete Course to Exchange'}
             </button>
           </div>

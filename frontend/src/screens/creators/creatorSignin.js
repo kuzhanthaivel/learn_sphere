@@ -29,10 +29,10 @@ const LoginPage = () => {
         throw new Error(data.message || 'Sign in failed');
       }
 
-      localStorage.setItem('creatorToken', data.token); 
+      localStorage.setItem('creatorToken', data.token);
       localStorage.setItem('isCreatorLoggedIn', true);
 
-      navigate('/CreaorDashboard'); 
+      navigate('/CreaorDashboard');
 
     } catch (err) {
       setError(err.message || 'An error occurred during sign in');

@@ -7,7 +7,7 @@ import defaultProfile from '../assets/defaultProfile.png';
 import { useNavigate } from "react-router-dom";
 
 const Navbar = () => {
-  const [authStatus, setAuthStatus] = useState('loading'); 
+  const [authStatus, setAuthStatus] = useState('loading');
   const [studentData, setStudentData] = useState(null);
   const [showDropdown, setShowDropdown] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -16,13 +16,13 @@ const Navbar = () => {
   useEffect(() => {
     const checkStudentAuthStatus = async () => {
       const studentToken = localStorage.getItem('studentToken');
-    
+
       if (!studentToken) {
         clearStudentAuth();
         setAuthStatus('loggedOut');
         return;
       }
-    
+
       try {
         const response = await fetch('http://localhost:5001/api/students/me', {
           headers: {
@@ -30,11 +30,11 @@ const Navbar = () => {
             'Content-Type': 'application/json'
           }
         });
-          
+
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         setStudentData(data.student);
         setAuthStatus('loggedIn');
@@ -45,7 +45,7 @@ const Navbar = () => {
         setAuthStatus('loggedOut');
       }
     };
-    
+
     checkStudentAuthStatus();
   }, []);
 
@@ -63,12 +63,12 @@ const Navbar = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return defaultProfile;
-    
+
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
       return imagePath;
     }
     const filename = imagePath.replace(/^.*[\\]/, '');
-    
+
     return `http://localhost:5001/uploads/${filename}`;
   };
 
@@ -80,7 +80,7 @@ const Navbar = () => {
             <img src={learnSphere} alt="Learn Sphere" width={120} height={40} />
           </Link>
         </div>
-        
+
         <div className="flex items-center space-x-4">
           <div className="hidden md:flex space-x-6">
             {[...Array(5)].map((_, i) => (
@@ -105,7 +105,7 @@ const Navbar = () => {
         </Link>
       </div>
 
-      <button 
+      <button
         className="md:hidden focus:outline-none"
         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         aria-label="Toggle menu"
@@ -113,7 +113,7 @@ const Navbar = () => {
         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           {mobileMenuOpen ? (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          )   :  (
+          ) : (
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
           )}
         </svg>
@@ -121,21 +121,21 @@ const Navbar = () => {
 
       {authStatus === 'loggedIn' && (
         <div className="hidden space-x-6 text-gray-700 md:flex">
-          <NavLink to="/Home"       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Home</NavLink>
-          <NavLink to="/dashboard"       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Dashboard</NavLink>
-          <NavLink to="/Community"       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Community</NavLink>
-          <NavLink to="/transaction"       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Chain Transaction</NavLink>
-          <NavLink to="/Profile"       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Profile</NavLink>
+          <NavLink to="/Home" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Home</NavLink>
+          <NavLink to="/dashboard" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Dashboard</NavLink>
+          <NavLink to="/Community" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Community</NavLink>
+          <NavLink to="/transaction" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Chain Transaction</NavLink>
+          <NavLink to="/Profile" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Profile</NavLink>
         </div>
       )}
 
@@ -172,17 +172,17 @@ const Navbar = () => {
             <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg">
               Coins: {studentData?.coins || 0}
             </div>
-            
+
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center space-x-2 focus:outline-none"
                 aria-label="User profile"
               >
-                <img 
-                  src={getImageUrl(studentData?.profile?.image)} 
-                  alt="Profile" 
-                  className="w-8 h-8 rounded-full border border-gray-300 object-cover" 
+                <img
+                  src={getImageUrl(studentData?.profile?.image)}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border border-gray-300 object-cover"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = defaultProfile;
@@ -192,7 +192,7 @@ const Navbar = () => {
                   {studentData?.name || studentData?.username || 'Student'}
                 </span>
               </button>
-              
+
               {showDropdown && (
                 <div className="absolute right-0 z-10 w-48 py-1 mt-2 bg-white rounded-md shadow-lg border border-gray-200">
                   <button

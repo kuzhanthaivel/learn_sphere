@@ -79,7 +79,7 @@ export default function CourseBinding() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setIsConnected(true);
-        
+
         window.ethereum.on('accountsChanged', (newAccounts) => {
           if (newAccounts.length > 0) {
             setWalletAddress(newAccounts[0]);
@@ -88,11 +88,11 @@ export default function CourseBinding() {
             setIsConnected(false);
           }
         });
-        
+
         window.ethereum.on('chainChanged', () => {
           window.location.reload();
         });
-        
+
       } catch (error) {
         console.error("User rejected request:", error);
         if (error.code === 4001) {
@@ -118,10 +118,10 @@ export default function CourseBinding() {
       const durationData = durationOptions[selectedDuration];
       const moneyCost = (courseData.price * durationData.percentage) / 100;
       const calculatedCoinsCost = Math.round((courseData.price * durationData.coinsMultiplier) / 100);
-      
+
       setRentalCost(moneyCost);
       setCoinsCost(calculatedCoinsCost);
-      
+
       if (paymentMethod === "coins") {
         setTotalPayment(calculatedCoinsCost);
       } else {
@@ -133,7 +133,7 @@ export default function CourseBinding() {
   const handlePaymentMethodChange = (e) => {
     const method = e.target.value;
     setPaymentMethod(method);
-    
+
     if (duration && courseData) {
       if (method === "coins") {
         setTotalPayment(coinsCost);
@@ -158,7 +158,7 @@ export default function CourseBinding() {
     setIsPurchasing(true);
     try {
       const finalPrice = courseData.price - ((courseData.price * courseData.discount) / 100);
-      
+
       const response = await fetch('http://localhost:5001/api/buy', {
         method: 'POST',
         headers: {
@@ -331,16 +331,16 @@ export default function CourseBinding() {
     );
   }
 
-  const imageUrl = courseData.coverImage 
+  const imageUrl = courseData.coverImage
     ? `http://localhost:5001/${courseData.coverImage.replace(/\\/g, '/')}`
-    : Image; 
+    : Image;
 
   return (
     <div className="bg-gray-50">
       <Navbar />
       <div className="py-5 px-6 ">
         <div className="flex items-center space-x-2 text-[#20B486] font-semibold text-xl mb-6">
-          <button 
+          <button
             onClick={() => navigate(-1)}
             className="border border-gray-200 py-2 pl-3 pr-1 rounded-xl cursor-pointer text-black text-center"
           >
@@ -387,26 +387,26 @@ export default function CourseBinding() {
             className="w-full h-48 object-cover rounded-md mb-4"
           />
           <div className="flex justify-evenly mb-3">
-            <button 
+            <button
               className={`px-4 py-1 ${activeTab === "buy" ? "text-green-600 border-b-2 border-green-500" : "text-gray-500"} font-medium`}
               onClick={() => setActiveTab("buy")}
             >
               Buy
             </button>
-            <button 
+            <button
               className={`px-4 py-1 ${activeTab === "rent" ? "text-green-600 border-b-2 border-green-500" : "text-gray-500"} font-medium`}
               onClick={() => setActiveTab("rent")}
             >
               Rentals
             </button>
-          </div> 
+          </div>
           {isConnected ? (
             <div className="mb-4 w-full">
               <div className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-evenly hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors">
                 <span className="text-sm font-medium text-green-800 truncate">
                   {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
                 </span>
-                <button 
+                <button
                   onClick={disconnectWallet}
                   className="text-xs text-red-500 hover:text-red-700"
                 >
@@ -415,7 +415,7 @@ export default function CourseBinding() {
               </div>
             </div>
           ) : (
-            <button 
+            <button
               onClick={connectWallet}
               className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
             >
@@ -428,30 +428,29 @@ export default function CourseBinding() {
               <p className="text-sm mb-4 text-center font-bold">Unlock the full course and gain lifetime access to all materials.</p>
               <div className="text-sm">
                 <div className="flex justify-between items-center">
-                  <p className="my-4">Course Amount: </p> 
+                  <p className="my-4">Course Amount: </p>
                   <p className="font-semibold">₹{courseData.price}</p>
                 </div>
                 <div className="flex justify-between items-center">
                   <p className="my-4">Discount Applied: </p>
-                  <span className="font-semibold">₹{(courseData.price * courseData.discount)/100}</span>
+                  <span className="font-semibold">₹{(courseData.price * courseData.discount) / 100}</span>
                 </div>
                 <hr className="my-4" />
                 <div className="flex justify-between items-center gap-8">
                   <p className="my-4 text-base font-bold">Total Payment: </p>
                   <p className="font-bold text-green-600">
-                    ₹{(courseData.price - ((courseData.price * courseData.discount)/100)).toFixed(2)}
+                    ₹{(courseData.price - ((courseData.price * courseData.discount) / 100)).toFixed(2)}
                   </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={handlePurchase}
                 disabled={isPurchasing || blockchainLoading}
-                className={`w-full mt-5 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                  isPurchasing || blockchainLoading ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+                className={`w-full mt-5 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${isPurchasing || blockchainLoading ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
               >
-                {isPurchasing ? 'Processing...' : 
-                 blockchainLoading ? 'Recording on blockchain...' : 'Purchase Course'}
+                {isPurchasing ? 'Processing...' :
+                  blockchainLoading ? 'Recording on blockchain...' : 'Purchase Course'}
               </button>
             </div>
           ) : (
@@ -484,7 +483,7 @@ export default function CourseBinding() {
                   <option value="">Select Duration</option>
                   {Object.keys(durationOptions).map((dur) => (
                     <option key={dur} value={dur}>
-                      {dur} 
+                      {dur}
                     </option>
                   ))}
                 </select>
@@ -492,17 +491,17 @@ export default function CourseBinding() {
 
               {duration && (
                 <div className="mb-4 p-3 rounded">
-                  <div className="flex justify-between items-center"> 
-                    <p className="my-4">{paymentMethod === "coins" ? "coins Cost" : "Rental Cost"}: </p> 
+                  <div className="flex justify-between items-center">
+                    <p className="my-4">{paymentMethod === "coins" ? "coins Cost" : "Rental Cost"}: </p>
                     <p className="font-semibold">
-                      {paymentMethod === "coins" ? 
-                        `${coinsCost} coins` : 
+                      {paymentMethod === "coins" ?
+                        `${coinsCost} coins` :
                         `₹${rentalCost.toFixed(2)} (${durationOptions[duration].percentage}%)`}
-                    </p> 
+                    </p>
                   </div>
-                  <div className="flex justify-between items-center"> 
-                    <p className="my-4">Duration:</p> 
-                    <p className="font-semibold">{duration}</p> 
+                  <div className="flex justify-between items-center">
+                    <p className="my-4">Duration:</p>
+                    <p className="font-semibold">{duration}</p>
                   </div>
 
                   <hr className="my-4" />
@@ -515,15 +514,14 @@ export default function CourseBinding() {
                 </div>
               )}
 
-              <button 
+              <button
                 onClick={handleRent}
                 disabled={isRenting || blockchainLoading || !paymentMethod || !duration}
-                className={`w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                  isRenting || blockchainLoading || !paymentMethod || !duration ? 'opacity-70 cursor-not-allowed' : ''
-                }`}
+                className={`w-full bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${isRenting || blockchainLoading || !paymentMethod || !duration ? 'opacity-70 cursor-not-allowed' : ''
+                  }`}
               >
-                {isRenting ? 'Processing...' : 
-                 blockchainLoading ? 'Recording on blockchain...' : 'Rent Course'}
+                {isRenting ? 'Processing...' :
+                  blockchainLoading ? 'Recording on blockchain...' : 'Rent Course'}
               </button>
             </div>
           )}

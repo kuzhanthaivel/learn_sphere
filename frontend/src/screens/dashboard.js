@@ -7,29 +7,29 @@ import CoverImage1 from "../assets/CoverImage1.png";
 import Mycourse from '../assets/MyCourse.png'
 import { useNavigate } from 'react-router-dom';
 
-const CourseCard = ({ 
+const CourseCard = ({
   id,
-  category, 
-  coverImage, 
-  title, 
+  category,
+  coverImage,
+  title,
   description,
   community,
   onCommunityClick
 }) => {
-        const imageUrl = coverImage 
-          ? `http://localhost:5001/${coverImage.replace(/\\/g, '/')}`
-          : CoverImage1;
-      
+  const imageUrl = coverImage
+    ? `http://localhost:5001/${coverImage.replace(/\\/g, '/')}`
+    : CoverImage1;
+
   return (
     <div className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105">
       <div className="relative">
         <div className="absolute bg-white left-1 top-1 px-2 py-1 rounded-lg bg-opacity-50">
           {category}
         </div>
-        <img 
+        <img
           src={imageUrl}
-          className="w-full h-32 object-cover" 
-          alt={`${title} course cover`} 
+          className="w-full h-32 object-cover"
+          alt={`${title} course cover`}
         />
       </div>
       <div className="border-b border-gray-300 p-2">
@@ -37,7 +37,7 @@ const CourseCard = ({
         <p className="text-gray-400 text-sm line-clamp-2">{description}</p>
       </div>
       <div className="flex justify-between items-center w-full pt-2">
-        <button 
+        <button
           className="text-xs bg-blue-500 text-white px-2 py-1 rounded flex items-center"
           onClick={(e) => {
             e.stopPropagation();
@@ -118,9 +118,9 @@ export default function Dashboard() {
       <div className="bg-[#E9F8F3] min-h-screen">
         <Header />
         <div className="w-full mx-auto bg-white p-4 rounded-lg scale-95 flex justify-center items-center h-64">
-                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
-                <span className="ml-3 text-gray-600">Loading data...</span>
-              </div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+          <span className="ml-3 text-gray-600">Loading data...</span>
+        </div>
         <Footer />
       </div>
     );
@@ -144,14 +144,14 @@ export default function Dashboard() {
 
       <div className='flex p-20 '>
         <div className='items-center flex'>
-          <img 
-            src={Mycourse} 
-            className="w-52" 
-            alt="my Courses Section" 
+          <img
+            src={Mycourse}
+            className="w-52"
+            alt="my Courses Section"
           />
         </div>
 
-        <div className="container px-4 py-8 ">        
+        <div className="container px-4 py-8 ">
           {courses.length === 0 ? (
             <div className="text-center py-10">
               <p>You don't have any courses yet.</p>

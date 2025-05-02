@@ -19,11 +19,9 @@ const CertificateScreen = () => {
           throw new Error("Failed to connect to blockchain");
         }
 
-        // Get all certificates from blockchain
         const allCertificates = await contract.getAllCertificates();
         
 
-        // Find the specific certificate by ID
         const foundCertificate = allCertificates.find(
           cert => cert.certificateId === id
         );
@@ -42,7 +40,6 @@ const CertificateScreen = () => {
             
             return `http://localhost:5001/uploads/${filename}`;
           };
-        // Format the certificate data
         const formattedCertificate = {
           userName: foundCertificate.userName,
           profileImage: getImageUrl(foundCertificate.profileImage),
@@ -76,7 +73,6 @@ const CertificateScreen = () => {
 
   const handleDownloadPDF = () => {
     toast.success("PDF download started");
-    // Implement actual PDF generation and download here
   };
 
   if (loading) {
@@ -114,7 +110,6 @@ const CertificateScreen = () => {
     <div className="min-h-screen bg-gray-50 py-8 px-4 flex items-center justify-center flex-col gap-7">
       <div className="max-w-4xl w-full mx-auto bg-white rounded-lg shadow-xl overflow-hidden border border-gray-200">
         <div className="border-8 border-amber-50 p-1">
-          {/* Certificate Header */}
           <div className="bg-gradient-to-r from-amber-50 to-amber-100 py-8 px-8 text-center relative">
             <div className="absolute top-2 right-2 bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full flex items-center">
               <svg className="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
@@ -132,7 +127,6 @@ const CertificateScreen = () => {
             <p className="text-gray-600 mt-2">This certificate is proudly presented to</p>
           </div>
 
-          {/* Certificate Body */}
           <div className="py-12 px-8 text-center relative">
             <div className="w-full flex items-center justify-center">
               <img 
@@ -157,7 +151,6 @@ const CertificateScreen = () => {
             </div>
           </div>
 
-          {/* Certificate Footer */}
           <div className="bg-gray-50 px-8 py-6 border-t border-gray-200">
             <div className="flex flex-col md:flex-row justify-between items-center">
               <div className="mb-4 md:mb-0 flex items-center">
@@ -190,7 +183,6 @@ const CertificateScreen = () => {
         </div>
       </div>
 
-      {/* Action Buttons */}
       <div className="flex justify-center gap-4">
         <button 
           onClick={handleDownloadPDF}

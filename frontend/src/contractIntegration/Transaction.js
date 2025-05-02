@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-const contractABI =[
+const contractABI = [
 	{
 		"inputs": [
 			{
@@ -180,13 +180,13 @@ const contractABI =[
 const contractAddress = "0xc9890272b245158f2d962c0e293d0e63dd2a1494";
 
 export const getContract = () => {
-  if (!window.ethereum) {
-    alert("MetaMask is not installed!");
-    return null;
-  }
+	if (!window.ethereum) {
+		alert("MetaMask is not installed!");
+		return null;
+	}
 
-  const provider = new ethers.providers.Web3Provider(window.ethereum);
-  const signer = provider.getSigner();
-  return new ethers.Contract(contractAddress, contractABI, signer);
+	const provider = new ethers.providers.Web3Provider(window.ethereum);
+	const signer = provider.getSigner();
+	return new ethers.Contract(contractAddress, contractABI, signer);
 };
 

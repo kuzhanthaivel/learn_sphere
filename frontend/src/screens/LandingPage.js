@@ -7,15 +7,15 @@ import RegisterNow from "../components/landingPage/registerNow";
 
 import React from "react";
 
-export default function landingPage( ) {
+export default function landingPage() {
     return (
         <div>
-        <Header/>
-        <Hero/>
-        <Features/>
-        <Categories/>
-        <RegisterNow/>
-        <Footer/>
+            <Header />
+            <Hero />
+            <Features />
+            <Categories />
+            <RegisterNow />
+            <Footer />
         </div>
     )
 }

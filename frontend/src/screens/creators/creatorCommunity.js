@@ -4,7 +4,7 @@ import learnSphere from '../../assets/learnSphere.png'
 import { RiCommunityLine } from "react-icons/ri";
 import { FaHome } from "react-icons/fa";
 import { VscVerifiedFilled } from "react-icons/vsc";
-import {  useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 const CommunityChat = () => {
   const [message, setMessage] = useState("");
@@ -36,13 +36,13 @@ const CommunityChat = () => {
             'Authorization': `Bearer ${creatorToken}`
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch communities');
         }
-        
+
         const data = await response.json();
-        
+
         if (data.success && data.communities.length > 0) {
           setCommunities(data.communities);
           if (data.communities.length > 0) {
@@ -68,10 +68,10 @@ const CommunityChat = () => {
 
   const fetchCommunityMessages = async (communityId) => {
     if (!communityId) return;
-    
+
     setFetchingMessages(true);
     setError(null);
-    
+
     try {
       const response = await fetch('http://localhost:5001/api/communities/fetchMessage', {
         method: 'POST',
@@ -81,13 +81,13 @@ const CommunityChat = () => {
         },
         body: JSON.stringify({ communityId })
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch messages');
       }
-      
+
       const data = await response.json();
-      
+
       if (data.success) {
         setMessages(formatMessages(data.messages));
       }
@@ -101,7 +101,7 @@ const CommunityChat = () => {
 
   const formatMessages = (apiMessages) => {
     if (!apiMessages) return [];
-    
+
     return apiMessages.map(msg => ({
       id: msg._id,
       sender: msg.isYou ? "You" : msg.userName,
@@ -118,22 +118,22 @@ const CommunityChat = () => {
       setError('Message too long (max 500 characters)');
       return;
     }
-    
+
     setIsSending(true);
     setError(null);
-    
+
     const tempMessage = {
       id: `temp-${Date.now()}`,
       sender: "You",
       content: message,
       time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       isYou: true,
-      userType: "Student" 
+      userType: "Student"
     };
-    
+
     setMessages(prev => [...prev, tempMessage]);
     setMessage("");
-    
+
     try {
       const response = await fetch(`http://localhost:5001/api/communities/addMessage`, {
         method: 'POST',
@@ -141,18 +141,18 @@ const CommunityChat = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${creatorToken}`
         },
-        body: JSON.stringify({ 
-          communityId: selectedCommunity._id, 
-          content: message 
+        body: JSON.stringify({
+          communityId: selectedCommunity._id,
+          content: message
         })
       });
-      
+
       if (!response.ok) {
         throw new Error(response.status === 401 ? 'Unauthorized' : 'Failed to send message');
       }
-      
+
       const data = await response.json();
-      
+
       if (data.newMessage) {
         setMessages(prev => [
           ...prev.filter(m => m.id !== tempMessage.id),
@@ -203,7 +203,7 @@ const CommunityChat = () => {
       <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
         <div className="text-center text-red-500">
           <p>Error: {error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
           >
@@ -219,7 +219,7 @@ const CommunityChat = () => {
       <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
         <div className="text-center">
           <p>You haven't joined any communities yet.</p>
-          <button 
+          <button
             onClick={() => navigate('/CreaorDashboard')}
             className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
           >
@@ -235,10 +235,10 @@ const CommunityChat = () => {
 
       <aside className="w-16 bg-gray-800 flex flex-col items-center py-4 space-y-6">
         <button className="text-green-500 text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-            <RiCommunityLine/>    
+          <RiCommunityLine />
         </button>
         <button onClick={() => navigate(-1)} className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
-        <FaHome/>  
+          <FaHome />
         </button>
       </aside>
 
@@ -251,7 +251,7 @@ const CommunityChat = () => {
             <div>
               <div className="flex justify-start items-center gap-1">
                 <h2 className="text-sm">Community</h2>
-                <VscVerifiedFilled className="text-sky-700"/>
+                <VscVerifiedFilled className="text-sky-700" />
               </div>
               <h2 className="text-sm text-gray-400">{selectedCommunity.name}</h2>
             </div>
@@ -264,10 +264,10 @@ const CommunityChat = () => {
         )}
 
         <div className="flex flex-grow overflow-hidden">
-          <div 
+          <div
             className="flex-grow bg-[#20262a] bg-cover bg-center p-6 overflow-y-auto"
-            style={{ 
-              backgroundImage: `url(${chatbg})`, 
+            style={{
+              backgroundImage: `url(${chatbg})`,
               backgroundBlendMode: 'overlay',
               scrollbarWidth: 'none',
               msOverflowStyle: 'none'
@@ -280,22 +280,20 @@ const CommunityChat = () => {
             ) : (
               <div className="space-y-4 [&::-webkit-scrollbar]:hidden">
                 {messages.map((msg) => (
-                  <div 
-                    key={msg.id} 
+                  <div
+                    key={msg.id}
                     className={`flex flex-col ${msg.isYou ? 'items-end' : 'items-start'}`}
                   >
-                    <div 
-                      className={`rounded-lg p-4 max-w-xs md:max-w-md lg:max-w-lg ${
-                        msg.isYou 
-                          ? 'bg-[#111B21] text-gray-200' 
-                          : msg.userType === 'Creator' 
-                            ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200' 
+                    <div
+                      className={`rounded-lg p-4 max-w-xs md:max-w-md lg:max-w-lg ${msg.isYou
+                          ? 'bg-[#111B21] text-gray-200'
+                          : msg.userType === 'Creator'
+                            ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200'
                             : 'bg-[#111B21] text-gray-200'
-                      }`}
+                        }`}
                     >
-                      <span className={`font-semibold ${
-                        msg.userType === 'Creator' ? 'text-green-500' : 'text-violet-500'
-                      }`}>
+                      <span className={`font-semibold ${msg.userType === 'Creator' ? 'text-green-500' : 'text-violet-500'
+                        }`}>
                         {msg.sender}
                         {msg.userType === 'Creator' && <VscVerifiedFilled className="inline ml-1 text-green-500" />}
                       </span>
@@ -323,21 +321,20 @@ const CommunityChat = () => {
             disabled={!selectedCommunity || isSending || fetchingMessages}
             maxLength={500}
           />
-          <button 
+          <button
             onClick={handleSendMessage}
             disabled={!selectedCommunity || isSending || message.trim() === "" || fetchingMessages}
-            className={`bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg ml-4 transition ${
-              (!selectedCommunity || isSending || message.trim() === "" || fetchingMessages) ? 'opacity-50 cursor-not-allowed' : ''
-            }`}
+            className={`bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg ml-4 transition ${(!selectedCommunity || isSending || message.trim() === "" || fetchingMessages) ? 'opacity-50 cursor-not-allowed' : ''
+              }`}
           >
             {isSending ? 'Sending...' : 'Send'}
           </button>
         </div>
       </div>
 
-      <aside 
+      <aside
         className="w-96 bg-gray-800 p-6 overflow-y-auto border-l border-gray-700 flex-col items-center"
-        style={{ 
+        style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'
         }}
@@ -350,9 +347,8 @@ const CommunityChat = () => {
             <li
               key={community._id}
               onClick={() => handleCommunitySelect(community)}
-              className={`flex items-center space-x-3 p-2 rounded-lg hover:ring-2 hover:ring-green-500 transition cursor-pointer ${
-                selectedCommunity && selectedCommunity._id === community._id ? 'bg-gray-600' : 'bg-gray-700'
-              }`}
+              className={`flex items-center space-x-3 p-2 rounded-lg hover:ring-2 hover:ring-green-500 transition cursor-pointer ${selectedCommunity && selectedCommunity._id === community._id ? 'bg-gray-600' : 'bg-gray-700'
+                }`}
             >
               <div className="w-10 h-10 rounded-lg bg-gray-600 flex items-center justify-center">
                 <span className="text-lg">{community.name.charAt(0).toUpperCase()}</span>

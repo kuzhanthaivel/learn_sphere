@@ -51,9 +51,9 @@ const UploadCourseForm = () => {
   const handleFileUpload = (index, file) => {
     const updatedSyllabus = [...formData.syllabus];
     updatedSyllabus[index].videoFile = file;
-    updatedSyllabus[index].videoUrl = ""; 
+    updatedSyllabus[index].videoUrl = "";
     setFormData(prev => ({ ...prev, syllabus: updatedSyllabus }));
-    
+
     setUploadMethod(prev => ({ ...prev, [index]: 'file' }));
 
     setUploadProgress(prev => ({ ...prev, [index]: 0 }));
@@ -88,77 +88,77 @@ const UploadCourseForm = () => {
         sno: idx + 1
       }));
       setFormData(prev => ({ ...prev, syllabus: renumberedSyllabus }));
-      
+
       const newProgress = { ...uploadProgress };
       delete newProgress[index];
       setUploadProgress(newProgress);
-      
+
       const newMethods = { ...uploadMethod };
       delete newMethods[index];
       setUploadMethod(newMethods);
     }
   };
 
-const handleFormSubmit = async (e) => {
-  e.preventDefault();
-  setIsSubmitting(true);
-  setSubmitError(null);
-  setSubmitSuccess(false);
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError(null);
+    setSubmitSuccess(false);
 
-  try {
-    const creatorToken = localStorage.getItem('creatorToken');
-    if (!creatorToken) {
-      throw new Error('Creator not authenticated. Please sign in.');
-    }
-
-    const formDataToSend = new FormData();
-
-    formDataToSend.append('title', formData.title);
-    formDataToSend.append('shortDescription', formData.shortDescription);
-    formDataToSend.append('fullDescription', formData.fullDescription);
-    formDataToSend.append('category', formData.category);
-    formDataToSend.append('price', formData.price);
-    formDataToSend.append('rating', formData.rating);
-    formDataToSend.append('discount', formData.discount);
-    formDataToSend.append('communityName', formData.communityName);
-
-    if (formData.coverImage) {
-      formDataToSend.append('coverImage', formData.coverImage);
-    }
-
-    formDataToSend.append('syllabus', JSON.stringify(
-      formData.syllabus.map(item => ({
-        title: item.title,
-        videoUrl: item.videoUrl
-      }))
-    ));
-
-    formData.syllabus.forEach((item, index) => {
-      if (item.videoFile) {
-        formDataToSend.append('videos', item.videoFile);
+    try {
+      const creatorToken = localStorage.getItem('creatorToken');
+      if (!creatorToken) {
+        throw new Error('Creator not authenticated. Please sign in.');
       }
-    });
 
-    const response = await fetch('http://localhost:5001/api/createCourse', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${creatorToken}`
-      },
-      body: formDataToSend
-    });
+      const formDataToSend = new FormData();
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to create course');
+      formDataToSend.append('title', formData.title);
+      formDataToSend.append('shortDescription', formData.shortDescription);
+      formDataToSend.append('fullDescription', formData.fullDescription);
+      formDataToSend.append('category', formData.category);
+      formDataToSend.append('price', formData.price);
+      formDataToSend.append('rating', formData.rating);
+      formDataToSend.append('discount', formData.discount);
+      formDataToSend.append('communityName', formData.communityName);
+
+      if (formData.coverImage) {
+        formDataToSend.append('coverImage', formData.coverImage);
+      }
+
+      formDataToSend.append('syllabus', JSON.stringify(
+        formData.syllabus.map(item => ({
+          title: item.title,
+          videoUrl: item.videoUrl
+        }))
+      ));
+
+      formData.syllabus.forEach((item, index) => {
+        if (item.videoFile) {
+          formDataToSend.append('videos', item.videoFile);
+        }
+      });
+
+      const response = await fetch('http://localhost:5001/api/createCourse', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${creatorToken}`
+        },
+        body: formDataToSend
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create course');
+      }
+
+      setSubmitSuccess(true);
+    } catch (error) {
+      setSubmitError(error.message);
+    } finally {
+      setIsSubmitting(false);
     }
-
-    setSubmitSuccess(true);
-  } catch (error) {
-    setSubmitError(error.message);
-  } finally {
-    setIsSubmitting(false);
-  }
-};
+  };
 
   return (
     <div>
@@ -172,7 +172,7 @@ const handleFormSubmit = async (e) => {
                 Upload New Course
               </h1>
             </div>
-            
+
             <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
               {submitSuccess && (
                 <div className="p-4 bg-green-100 text-green-700 rounded-lg">
@@ -246,9 +246,9 @@ const handleFormSubmit = async (e) => {
                     <div className="flex text-sm text-gray-600 justify-center">
                       <label className="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none">
                         <span>Upload a file</span>
-                        <input 
-                          type="file" 
-                          className="sr-only" 
+                        <input
+                          type="file"
+                          className="sr-only"
                           onChange={(e) => handleCoverImageUpload(e.target.files[0])}
                           accept="image/*"
                         />
@@ -385,7 +385,7 @@ const handleFormSubmit = async (e) => {
                               <FiUpload className="inline mr-1" /> Upload File
                             </button>
                           </div>
-                          
+
                           {uploadMethod[index] === 'url' ? (
                             <input
                               type="text"

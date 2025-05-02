@@ -12,13 +12,13 @@ const Navbar = () => {
   useEffect(() => {
     const checkCreatorAuthStatus = async () => {
       const creatorToken = localStorage.getItem('creatorToken');
-    
+
       if (!creatorToken) {
         clearCreatorAuth();
         setAuthStatus('loggedOut');
         return;
       }
-    
+
       try {
         const response = await fetch('http://localhost:5001/api/creator/me', {
           headers: {
@@ -26,15 +26,15 @@ const Navbar = () => {
             'Content-Type': 'application/json'
           }
         });
-        
+
         if (response.status === 401) {
           clearCreatorAuth();
           setAuthStatus('loggedOut');
           return;
         }
-        
+
         if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
-        
+
         const data = await response.json();
         setCreatorData(data.creator);
         setAuthStatus('loggedIn');
@@ -45,7 +45,7 @@ const Navbar = () => {
         setAuthStatus('loggedOut');
       }
     };
-    
+
     checkCreatorAuthStatus();
   }, []);
 
@@ -63,12 +63,12 @@ const Navbar = () => {
 
   const getImageUrl = (imagePath) => {
     if (!imagePath) return defaultProfile;
-    
+
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
       return imagePath;
     }
     const filename = imagePath.replace(/^.*[\\\/]/, '');
-    
+
     return `http://localhost:5001/uploads/${filename}`;
   };
 
@@ -99,15 +99,15 @@ const Navbar = () => {
 
       {authStatus === 'loggedIn' && (
         <div className="hidden space-x-6 text-gray-700 md:flex">
-          <NavLink to="/CreateCourse"      className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      } >Create Course</NavLink>
-          <NavLink to="/CreaorDashboard"       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Dashboard</NavLink>
-          <NavLink to="/CreatorCommunity "       className={({ isActive }) => 
-        isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
-      }>Community</NavLink>
+          <NavLink to="/CreateCourse" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          } >Create Course</NavLink>
+          <NavLink to="/CreaorDashboard" className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Dashboard</NavLink>
+          <NavLink to="/CreatorCommunity " className={({ isActive }) =>
+            isActive ? "font-medium text-green-600" : "font-medium text-gray-700"
+          }>Community</NavLink>
         </div>
       )}
 
@@ -115,21 +115,21 @@ const Navbar = () => {
         {authStatus === 'loggedIn' ? (
           <div className="flex items-center space-x-4">
             <div className="relative">
-              <button 
+              <button
                 onClick={() => setShowDropdown(!showDropdown)}
                 className="flex items-center space-x-2 focus:outline-none"
               >
-                <img 
-                  src={getImageUrl(creatorData?.profile?.image)} 
-                  alt="Profile" 
-                  className="w-8 h-8 rounded-full border border-gray-300 object-cover" 
+                <img
+                  src={getImageUrl(creatorData?.profile?.image)}
+                  alt="Profile"
+                  className="w-8 h-8 rounded-full border border-gray-300 object-cover"
                   onError={(e) => {
                     e.target.onerror = null;
                     e.target.src = defaultProfile;
                   }}
                 />
               </button>
-              
+
               {showDropdown && (
                 <div className="absolute right-0 z-10 w-48 py-1 mt-2 bg-white rounded-md shadow-lg border border-gray-200">
                   <button

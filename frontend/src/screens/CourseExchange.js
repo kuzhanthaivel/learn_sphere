@@ -29,7 +29,7 @@ export default function CourseExchange() {
   const [walletAddress, setWalletAddress] = useState("");
   const [isConnected, setIsConnected] = useState(false);
   const [blockchainLoading, setBlockchainLoading] = useState(false);
-  
+
   const checkWalletConnection = async () => {
     if (window.ethereum) {
       try {
@@ -49,7 +49,7 @@ export default function CourseExchange() {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setIsConnected(true);
-        
+
         window.ethereum.on('accountsChanged', (newAccounts) => {
           if (newAccounts.length > 0) {
             setWalletAddress(newAccounts[0]);
@@ -58,11 +58,11 @@ export default function CourseExchange() {
             setIsConnected(false);
           }
         });
-        
+
         window.ethereum.on('chainChanged', () => {
           window.location.reload();
         });
-        
+
       } catch (error) {
         console.error("User rejected request:", error);
         if (error.code === 4001) {
@@ -99,13 +99,13 @@ export default function CourseExchange() {
                 'Authorization': `Bearer ${studentToken}`
               }
             });
-            
+
             const codeData = await codeResponse.json();
-            
+
             if (!codeResponse.ok) {
               throw new Error(codeData.error || 'Failed to fetch exchange code');
             }
-            
+
             if (codeData.success) {
               setExchangeCode(codeData.code);
             } else {
@@ -119,15 +119,15 @@ export default function CourseExchange() {
             });
 
             const requestData = await requestResponse.json();
-            
+
             if (!requestResponse.ok) {
               throw new Error(requestData.error || 'Failed to fetch exchange requests');
             }
 
-            const relevantRequest = requestData.find(req => 
+            const relevantRequest = requestData.find(req =>
               req.initiatorCode === codeData.code || req.receiverCode === codeData.code
             );
-            
+
             setExchangeRequest(relevantRequest || null);
           } catch (err) {
             setCodeError(err.message);
@@ -194,18 +194,18 @@ export default function CourseExchange() {
       });
     }
   };
-  
+
   const isInitiator = exchangeRequest?.isInitiator;
 
   const handleCancelRequest = async () => {
     if (!exchangeRequest) return;
-  
+
     setExchangeStatus({
       loading: true,
       error: null,
       success: null
     });
-  
+
     try {
       const response = await fetch('http://localhost:5001/api/exchange', {
         method: 'POST',
@@ -219,13 +219,13 @@ export default function CourseExchange() {
           status: 'Canceled'
         })
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.error || 'Failed to cancel exchange request');
       }
-  
+
       setExchangeStatus({
         loading: false,
         error: null,
@@ -241,16 +241,16 @@ export default function CourseExchange() {
       });
     }
   };
-  
+
   const handleAcceptRequest = async () => {
     if (!exchangeRequest) return;
-  
+
     setExchangeStatus({
       loading: true,
       error: null,
       success: null
     });
-  
+
     try {
       const response = await fetch('http://localhost:5001/api/exchange', {
         method: 'POST',
@@ -260,11 +260,11 @@ export default function CourseExchange() {
         },
         body: JSON.stringify({
           requestId: exchangeRequest._id,
-          userType: 'receiver', 
+          userType: 'receiver',
           status: 'Accepted'
         })
       });
-  
+
       const data = await response.json();
 
       if (!response.ok) {
@@ -304,7 +304,7 @@ export default function CourseExchange() {
       });
 
       setExchangeRequest(null);
-      navigate('/dashboard'); 
+      navigate('/dashboard');
     } catch (err) {
       setExchangeStatus({
         loading: false,
@@ -320,11 +320,11 @@ export default function CourseExchange() {
       <span className="ml-3 text-gray-600">Loading data...</span>
     </div>
   );
-  
+
   if (error) return <div className="text-center py-10 text-red-500">Error: {error}</div>;
   if (!courseData) return <div className="text-center py-10">Course not found</div>;
 
-  const imageUrl = courseData.coverImage 
+  const imageUrl = courseData.coverImage
     ? `http://localhost:5001/${courseData.coverImage.replace(/\\/g, '/')}`
     : Image;
 
@@ -335,8 +335,8 @@ export default function CourseExchange() {
       <Navbar />
       <div className="py-5 px-6 ">
         <div className="flex items-center space-x-2 text-[#20B486] font-semibold text-xl mb-6">
-          <button 
-            onClick={() => navigate(-1)} 
+          <button
+            onClick={() => navigate(-1)}
             className="border border-gray-200 py-2 pl-3 pr-1 rounded-xl cursor-pointer text-black text-center"
           >
             <MdArrowBackIos />
@@ -392,7 +392,7 @@ export default function CourseExchange() {
             <p className="text-sm mb-4 text-center font-bold">
               Unlock the full course and gain lifetime access to all materials.
             </p>
-            
+
             <div className="mb-4 border relative rounded-lg border-2 p-2 mt-3">
               <label className="block text-sm font-medium text-gray-700 absolute bg-white -top-3 px-1">
                 Your Exchange code
@@ -412,7 +412,7 @@ export default function CourseExchange() {
                 <p className="text-gray-500 text-sm">No exchange code available</p>
               )}
             </div>
-            
+
             {showRequestUI && (
               <>
                 <div className="mb-4 border relative rounded-lg border-2 p-2 mt-3">
@@ -426,10 +426,9 @@ export default function CourseExchange() {
 
                 <div className="flex gap-2">
                   {isInitiator ? (
-                    <button 
-                      className={`w-full bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${
-                        exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
-                      }`}
+                    <button
+                      className={`w-full bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
+                        }`}
                       disabled={exchangeStatus.loading}
                       onClick={handleCancelRequest}
                     >
@@ -448,19 +447,17 @@ export default function CourseExchange() {
                   ) : (
                     <div className="flex items-center flex-col w-full">
                       <div className="w-full flex justify-between gap-3 pb-3">
-                        <button 
-                          className={`flex-1 bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${
-                            exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
+                        <button
+                          className={`flex-1 bg-red-500 text-white p-3 rounded hover:bg-red-600 transition-all duration-200 ${exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                           disabled={exchangeStatus.loading}
                           onClick={handleCancelRequest}
                         >
                           Cancel
                         </button>
-                        <button 
-                          className={`flex-1 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                            exchangeStatus.loading || blockchainLoading ? 'opacity-50 cursor-not-allowed' : ''
-                          }`}
+                        <button
+                          className={`flex-1 bg-green-500 text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${exchangeStatus.loading || blockchainLoading ? 'opacity-50 cursor-not-allowed' : ''
+                            }`}
                           disabled={exchangeStatus.loading || blockchainLoading}
                           onClick={handleAcceptRequest}
                         >
@@ -474,7 +471,7 @@ export default function CourseExchange() {
                             <span className="text-sm font-medium text-green-800 truncate">
                               {`${walletAddress.substring(0, 6)}...${walletAddress.substring(walletAddress.length - 4)}`}
                             </span>
-                            <button 
+                            <button
                               onClick={disconnectWallet}
                               className="text-xs text-red-500 hover:text-red-700"
                             >
@@ -483,7 +480,7 @@ export default function CourseExchange() {
                           </div>
                         </div>
                       ) : (
-                        <button 
+                        <button
                           onClick={connectWallet}
                           className="px-3 py-2 font-semibold bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center w-full justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
                         >
@@ -509,7 +506,7 @@ export default function CourseExchange() {
                     onChange={(e) => setFriendCode(e.target.value)}
                   />
                 </div>
-                
+
                 {exchangeStatus.error && (
                   <div className="text-red-500 text-sm mb-2">{exchangeStatus.error}</div>
                 )}
@@ -517,10 +514,9 @@ export default function CourseExchange() {
                   <div className="text-green-500 text-sm mb-2">{exchangeStatus.success}</div>
                 )}
 
-                <button 
-                  className={`w-full bg-[#20B486] text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${
-                    !exchangeCode || exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                <button
+                  className={`w-full bg-[#20B486] text-white p-3 rounded hover:bg-green-600 transition-all duration-200 ${!exchangeCode || exchangeStatus.loading ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                   disabled={!exchangeCode || exchangeStatus.loading}
                   onClick={handleExchangeRequest}
                 >

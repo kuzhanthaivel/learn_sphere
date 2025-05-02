@@ -37,10 +37,10 @@ const SignUp = () => {
       setWalletError('');
 
       if (window.ethereum) {
-        const accounts = await window.ethereum.request({ 
-          method: 'eth_requestAccounts' 
+        const accounts = await window.ethereum.request({
+          method: 'eth_requestAccounts'
         });
-        
+
         if (accounts.length === 0) {
           throw new Error("No accounts found");
         }
@@ -57,7 +57,7 @@ const SignUp = () => {
           ? "Please install MetaMask to connect your wallet!"
           : "Failed to connect wallet. Please try again."
       );
-      
+
       if (error.message === "MetaMask not installed") {
         window.open("https://metamask.io/download.html", "_blank");
       }
@@ -74,7 +74,7 @@ const SignUp = () => {
       setSubmitError("Passwords don't match!");
       return;
     }
-  
+
     try {
       setIsSubmitting(true);
 
@@ -96,9 +96,9 @@ const SignUp = () => {
         method: 'POST',
         body: formDataToSend,
       });
-  
+
       const result = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(result.error || 'Signup failed');
       }
@@ -123,7 +123,7 @@ const SignUp = () => {
               <h1 className="text-3xl font-bold text-[#FF7F00] mb-2">SIGN UP</h1>
               <p className="text-gray-600">Create your developer profile</p>
             </div>
-            
+
             {submitError && (
               <div className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg">
                 {submitError}

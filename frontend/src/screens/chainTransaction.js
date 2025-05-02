@@ -24,14 +24,13 @@ export default function ChainTransaction() {
   });
   const studentToken = localStorage.getItem('studentToken');
 
-  // Connect wallet handler
   const connectWallet = async () => {
     if (typeof window.ethereum !== 'undefined') {
       try {
         const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
         setWalletAddress(accounts[0]);
         setIsConnected(true);
-        
+
         window.ethereum.on('accountsChanged', (newAccounts) => {
           if (newAccounts.length > 0) {
             setWalletAddress(newAccounts[0]);
@@ -40,11 +39,11 @@ export default function ChainTransaction() {
             setIsConnected(false);
           }
         });
-        
+
         window.ethereum.on('chainChanged', () => {
           window.location.reload();
         });
-        
+
       } catch (error) {
         console.error("User rejected request:", error);
         if (error.code === 4001) {
@@ -57,21 +56,19 @@ export default function ChainTransaction() {
     }
   };
 
-  // Disconnect wallet handler
   const disconnectWallet = () => {
     setWalletAddress("");
     setIsConnected(false);
     setPayments([]);
   };
 
-  // Fetch payments from blockchain
   const fetchPayments = async () => {
     try {
-      setLoading(prev => ({...prev, web3: true}));
+      setLoading(prev => ({ ...prev, web3: true }));
       const contract = getContract();
       if (contract) {
         const data = await contract.getAllPayments();
-        
+
         const processedPayments = data.map(payment => ({
           transactionId: payment[0],
           user: payment[1],
@@ -83,59 +80,55 @@ export default function ChainTransaction() {
           amount: payment[7],
           exchangeId: payment[8]
         }));
-        
+
         setPayments(processedPayments);
       }
     } catch (error) {
       console.error("Error fetching payments:", error);
-      setError(prev => ({...prev, web3: "Failed to load transactions from blockchain"}));
+      setError(prev => ({ ...prev, web3: "Failed to load transactions from blockchain" }));
     } finally {
-      setLoading(prev => ({...prev, web3: false}));
+      setLoading(prev => ({ ...prev, web3: false }));
     }
   };
 
-  // Fetch Web2 transactions from API using fetch
   const fetchWeb2Transactions = async () => {
     try {
-      setLoading(prev => ({...prev, web2: true}));
+      setLoading(prev => ({ ...prev, web2: true }));
       const response = await fetch('http://localhost:5001/api/fetchTransaction', {
         headers: {
           'Authorization': `Bearer ${studentToken}`
         }
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to fetch transactions');
       }
-      
+
       const data = await response.json();
       setWeb2Transactions(data);
     } catch (error) {
       console.error("Error fetching Web2 transactions:", error);
-      setError(prev => ({...prev, web2: "Failed to load transactions from server"}));
+      setError(prev => ({ ...prev, web2: "Failed to load transactions from server" }));
     } finally {
-      setLoading(prev => ({...prev, web2: false}));
+      setLoading(prev => ({ ...prev, web2: false }));
     }
   };
 
-  // Format timestamp
   const formatTimestamp = (timestamp) => {
     if (!timestamp || timestamp === "test") return "N/A";
-    
+
     try {
-      // If timestamp is a Unix timestamp (seconds)
+
       if (!isNaN(timestamp)) {
         return new Date(parseInt(timestamp) * 1000).toLocaleString();
       }
-      
-      // If it's already a date string or Date object
+
       return new Date(timestamp).toLocaleString();
     } catch {
-      return timestamp; // Return as-is if can't parse
+      return timestamp;
     }
   };
 
-  // Get row color based on transaction type
   const getRowColor = (type) => {
     switch (type) {
       case "Buy":
@@ -149,7 +142,6 @@ export default function ChainTransaction() {
     }
   };
 
-  // Get amount color based on transaction type
   const getAmountColor = (type) => {
     switch (type) {
       case "Buy":
@@ -163,15 +155,13 @@ export default function ChainTransaction() {
     }
   };
 
-  // Filter payments by connected wallet address
-  const filteredPayments = isConnected 
+  const filteredPayments = isConnected
     ? payments.filter(payment => payment.user.toLowerCase() === walletAddress.toLowerCase())
     : [];
 
-  // Load data on mount and when wallet connects
   useEffect(() => {
     fetchWeb2Transactions();
-    
+
     if (isConnected) {
       fetchPayments();
     }
@@ -185,7 +175,7 @@ export default function ChainTransaction() {
         <div className="max-w-7xl mx-auto space-y-8">
           <div className="flex justify-between">
             <div className="flex items-center space-x-2 text-[#20B486] font-semibold text-xl">
-              <button 
+              <button
                 onClick={() => navigate(-1)}
                 className="border border-gray-200 py-2 pl-3 pr-1 rounded-xl cursor-pointer text-black text-center hover:bg-gray-100 transition-colors"
               >
@@ -201,7 +191,7 @@ export default function ChainTransaction() {
                     <span className="text-sm font-medium text-green-800 truncate">
                       {walletAddress.substring(0, 6)}...{walletAddress.substring(walletAddress.length - 4)}
                     </span>
-                    <button 
+                    <button
                       onClick={disconnectWallet}
                       className="text-xs text-red-500 hover:text-red-700"
                     >
@@ -210,7 +200,7 @@ export default function ChainTransaction() {
                   </div>
                 </div>
               ) : (
-                <button 
+                <button
                   onClick={connectWallet}
                   className="px-3 py-2 font-semibold w-56 h-11 bg-gradient-to-b from-[#C6EDE6] to-[#F2EFE4] rounded-lg bg-opacity-90 flex items-center justify-center hover:from-[#B0E5DB] hover:to-[#E5E2D4] transition-colors"
                 >
@@ -221,7 +211,6 @@ export default function ChainTransaction() {
             </div>
           </div>
 
-          {/* Blockchain Transactions Section */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
             <div className="px-6 py-4 border-b border-gray-200 bg-[#20B486] flex items-center">
               <FaEthereum className="text-white mr-2" />
@@ -299,8 +288,8 @@ export default function ChainTransaction() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {filteredPayments.map((payment, index) => (
-                        <tr 
-                          key={`web3-${index}`} 
+                        <tr
+                          key={`web3-${index}`}
                           className={`${getRowColor(payment.transactionType)} transition-colors`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">
@@ -316,12 +305,11 @@ export default function ChainTransaction() {
                             {payment.courseCategory || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              payment.transactionType === "Buy" ? "bg-green-100 text-green-800" :
-                              payment.transactionType === "Exchange" ? "bg-purple-100 text-purple-800" :
-                              payment.transactionType === "Rent" ? "bg-blue-100 text-blue-800" :
-                              "bg-gray-100 text-gray-800"
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${payment.transactionType === "Buy" ? "bg-green-100 text-green-800" :
+                                payment.transactionType === "Exchange" ? "bg-purple-100 text-purple-800" :
+                                  payment.transactionType === "Rent" ? "bg-blue-100 text-blue-800" :
+                                    "bg-gray-100 text-gray-800"
+                              }`}>
                               {payment.transactionType || "N/A"}
                             </span>
                           </td>
@@ -332,11 +320,11 @@ export default function ChainTransaction() {
                             {payment.amount || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                          {payment.exchangeId 
-    ? payment.exchangeId.length > 5
-      ? `${payment.exchangeId.substring(0, 5)}...` 
-      : payment.exchangeId
-    : "N/A"}
+                            {payment.exchangeId
+                              ? payment.exchangeId.length > 5
+                                ? `${payment.exchangeId.substring(0, 5)}...`
+                                : payment.exchangeId
+                              : "N/A"}
                           </td>
                         </tr>
                       ))}
@@ -347,19 +335,18 @@ export default function ChainTransaction() {
             </div>
           </div>
 
-          {/* Web2 Transactions Section */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-200 bg-[#20B486] flex items-center justify-between">
-  <div className="flex items-center">
-    <FaDatabase className="text-white mr-2" />
-    <h3 className="text-lg font-medium text-white">Traditional Transactions</h3>
-  </div>
-  {web2Transactions.length > 0 && (
-    <div className="text-white font-medium">
-      User: {web2Transactions[0].UserName || "N/A"}
-    </div>
-  )}
-</div>
+            <div className="px-6 py-4 border-b border-gray-200 bg-[#20B486] flex items-center justify-between">
+              <div className="flex items-center">
+                <FaDatabase className="text-white mr-2" />
+                <h3 className="text-lg font-medium text-white">Traditional Transactions</h3>
+              </div>
+              {web2Transactions.length > 0 && (
+                <div className="text-white font-medium">
+                  User: {web2Transactions[0].UserName || "N/A"}
+                </div>
+              )}
+            </div>
             <div className="p-6">
               {error.web2 && (
                 <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -419,8 +406,8 @@ export default function ChainTransaction() {
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
                       {web2Transactions.map((transaction, index) => (
-                        <tr 
-                          key={`web2-${index}`} 
+                        <tr
+                          key={`web2-${index}`}
                           className={`${getRowColor(transaction.transactionType)} transition-colors`}
                         >
                           <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-500">
@@ -436,12 +423,11 @@ export default function ChainTransaction() {
                             {transaction.courseCategory || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              transaction.transactionType === "Buy" ? "bg-green-100 text-green-800" :
-                              transaction.transactionType === "Exchange" ? "bg-purple-100 text-purple-800" :
-                              transaction.transactionType === "Rent" ? "bg-blue-100 text-blue-800" :
-                              "bg-gray-100 text-gray-800"
-                            }`}>
+                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${transaction.transactionType === "Buy" ? "bg-green-100 text-green-800" :
+                                transaction.transactionType === "Exchange" ? "bg-purple-100 text-purple-800" :
+                                  transaction.transactionType === "Rent" ? "bg-blue-100 text-blue-800" :
+                                    "bg-gray-100 text-gray-800"
+                              }`}>
                               {transaction.transactionType || "N/A"}
                             </span>
                           </td>
@@ -452,11 +438,11 @@ export default function ChainTransaction() {
                             {transaction.amount || "N/A"}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                          {transaction.exchangeId 
-    ? transaction.exchangeId.length > 5
-      ? `${transaction.exchangeId.substring(0, 5)}...` 
-      : transaction.exchangeId
-    : "N/A"}
+                            {transaction.exchangeId
+                              ? transaction.exchangeId.length > 5
+                                ? `${transaction.exchangeId.substring(0, 5)}...`
+                                : transaction.exchangeId
+                              : "N/A"}
                           </td>
                         </tr>
                       ))}
@@ -468,7 +454,6 @@ export default function ChainTransaction() {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );
