@@ -1,10 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import chatbg from "../../assets/chatbg.png";
-import learnSphere from '../../assets/learnSphere.png'
+import learnSphere from '../../assets/learnSphere.png';
 import { RiCommunityLine } from "react-icons/ri";
 import { FaHome } from "react-icons/fa";
 import { VscVerifiedFilled } from "react-icons/vsc";
 import { useNavigate } from 'react-router-dom';
+import { IoMdClose } from "react-icons/io";
 
 const CommunityChat = () => {
   const [message, setMessage] = useState("");
@@ -15,6 +16,7 @@ const CommunityChat = () => {
   const [error, setError] = useState(null);
   const [isSending, setIsSending] = useState(false);
   const [fetchingMessages, setFetchingMessages] = useState(false);
+  const [showSidebar, setShowSidebar] = useState(false);
   const navigate = useNavigate();
   const creatorToken = localStorage.getItem('creatorToken');
 
@@ -185,11 +187,12 @@ const CommunityChat = () => {
     setSelectedCommunity(community);
     fetchCommunityMessages(community._id);
     setError(null);
+    setShowSidebar(false);
   };
 
   if (loading) {
     return (
-      <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
+      <div className="h-screen flex bg-gray-900 text-white items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-green-500 mx-auto mb-4"></div>
           <p>Loading communities...</p>
@@ -200,7 +203,7 @@ const CommunityChat = () => {
 
   if (error && !communities.length) {
     return (
-      <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
+      <div className="h-screen flex bg-gray-900 text-white items-center justify-center">
         <div className="text-center text-red-500">
           <p>Error: {error}</p>
           <button
@@ -216,11 +219,11 @@ const CommunityChat = () => {
 
   if (communities.length === 0) {
     return (
-      <div className="max-h-screen min-h-screen flex bg-gray-900 text-white items-center justify-center">
+      <div className="h-screen flex bg-gray-900 text-white items-center justify-center">
         <div className="text-center">
           <p>You haven't joined any communities yet.</p>
           <button
-            onClick={() => navigate('/CreaorDashboard')}
+            onClick={() => navigate('/CreatorDashboard')}
             className="mt-4 bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg"
           >
             Explore Communities
@@ -231,9 +234,57 @@ const CommunityChat = () => {
   }
 
   return (
-    <div className="max-h-screen min-h-screen flex bg-gray-900 text-white">
+    <div className="h-screen flex flex-col md:flex-row bg-gray-900 text-white">
+      <header className="md:hidden bg-gray-800 px-4 py-3 flex justify-between items-center border-b border-gray-700">
+        <div className="flex items-center space-x-2">
+          <img src={learnSphere} alt="Learn Sphere" className="w-32" />
+        </div>
+        <button
+          onClick={() => setShowSidebar(!showSidebar)}
+          className="text-white p-2 rounded-lg hover:bg-gray-700"
+        >
+          <RiCommunityLine className="text-xl" />
+        </button>
+      </header>
 
-      <aside className="w-16 bg-gray-800 flex flex-col items-center py-4 space-y-6">
+      {showSidebar && (
+        <div className="md:hidden fixed inset-0 z-50 bg-gray-800 p-4 overflow-y-auto">
+          <div className="flex justify-between items-center mb-4">
+            <h3 className="text-green-400 text-lg font-semibold">Communities</h3>
+            <div>
+              <button
+                onClick={() => setShowSidebar(false)}
+                className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition"
+              >
+                <IoMdClose className="text-xl" />
+              </button>
+              <button onClick={() => navigate(-1)} className="text-white text-xl hover:bg-gray-700 p-2 rounded-lg transition">
+                <FaHome />
+              </button>
+            </div>
+          </div>
+          <ul className="space-y-3">
+            {communities.map((community) => (
+              <li
+                key={community._id}
+                onClick={() => handleCommunitySelect(community)}
+                className={`flex items-center space-x-3 p-2 rounded-lg hover:ring-2 hover:ring-green-500 transition cursor-pointer ${selectedCommunity && selectedCommunity._id === community._id ? 'bg-gray-600' : 'bg-gray-700'
+                  }`}
+              >
+                <div className="w-10 h-10 rounded-lg bg-gray-600 flex items-center justify-center">
+                  <span className="text-lg">{community.name.charAt(0).toUpperCase()}</span>
+                </div>
+                <div>
+                  <h4 className="text-sm font-medium line-clamp-1">{community.name}</h4>
+                  <p className="text-xs text-gray-400">{community.memberCount} members</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      <aside className="hidden md:flex w-16 bg-gray-800 flex-col items-center py-4 space-y-6">
         <button className="text-green-500 text-xl hover:bg-gray-700 p-2 rounded-lg transition">
           <RiCommunityLine />
         </button>
@@ -242,8 +293,8 @@ const CommunityChat = () => {
         </button>
       </aside>
 
-      <div className="flex-grow flex flex-col">
-        <header className="bg-gray-800 px-6 py-4 flex justify-center items-center space-x-2 border-b border-gray-700">
+      <div className="flex-1 flex flex-col h-full border border-gray-950 border-x-8">
+        <header className="hidden md:flex bg-gray-800 px-6 py-4 justify-center items-center space-x-2 border-b border-gray-700">
           <div className="flex items-center space-x-2">
             <img src={learnSphere} alt="Learn Sphere" className="w-40" />
           </div>
@@ -257,15 +308,16 @@ const CommunityChat = () => {
             </div>
           )}
         </header>
+
         {error && (
           <div className="bg-red-900 text-white p-2 text-center text-sm">
             {error}
           </div>
         )}
 
-        <div className="flex flex-grow overflow-hidden">
+        <div className="flex-1 overflow-hidden">
           <div
-            className="flex-grow bg-[#20262a] bg-cover bg-center p-6 overflow-y-auto"
+            className="h-full bg-[#20262a] bg-cover bg-center p-4 md:p-6 overflow-y-auto"
             style={{
               backgroundImage: `url(${chatbg})`,
               backgroundBlendMode: 'overlay',
@@ -274,7 +326,7 @@ const CommunityChat = () => {
             }}
           >
             {fetchingMessages ? (
-              <div className="flex justify-center items-center h-full">
+              <div className="flex justify-center items-center h-full ">
                 <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-green-500"></div>
               </div>
             ) : (
@@ -285,11 +337,11 @@ const CommunityChat = () => {
                     className={`flex flex-col ${msg.isYou ? 'items-end' : 'items-start'}`}
                   >
                     <div
-                      className={`rounded-lg p-4 max-w-xs md:max-w-md lg:max-w-lg ${msg.isYou
-                          ? 'bg-[#111B21] text-gray-200'
-                          : msg.userType === 'Creator'
-                            ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200'
-                            : 'bg-[#111B21] text-gray-200'
+                      className={`rounded-lg p-3 md:p-4 max-w-xs md:max-w-md lg:max-w-lg ${msg.isYou
+                        ? 'bg-[#111B21] text-gray-200'
+                        : msg.userType === 'Creator'
+                          ? 'bg-[#111B21] border-l-4 border-green-500 text-gray-200'
+                          : 'bg-[#111B21] text-gray-200'
                         }`}
                     >
                       <span className={`font-semibold ${msg.userType === 'Creator' ? 'text-green-500' : 'text-violet-500'
@@ -299,7 +351,7 @@ const CommunityChat = () => {
                       </span>
                       <p className="mt-1 text-sm">{msg.content}</p>
                     </div>
-                    <span className="text-sm text-gray-400 mt-1">{msg.time}</span>
+                    <span className="text-xs md:text-sm text-gray-400 mt-1">{msg.time}</span>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
@@ -307,7 +359,8 @@ const CommunityChat = () => {
             )}
           </div>
         </div>
-        <div className="bg-gray-800 p-4 flex items-center border-t border-gray-700">
+
+        <div className="bg-gray-800 p-3 md:p-4 flex items-center border-t border-gray-700">
           <input
             type="text"
             value={message}
@@ -317,15 +370,15 @@ const CommunityChat = () => {
             }}
             onKeyPress={handleKeyPress}
             placeholder={selectedCommunity ? `Message ${selectedCommunity.name} community...` : "Select a community..."}
-            className="flex-grow bg-gray-700 text-white px-4 py-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition"
+            className="flex-grow bg-gray-700 text-white px-3 py-2 md:px-4 md:py-2 rounded-lg focus:ring-2 focus:ring-green-500 focus:outline-none transition text-sm md:text-base"
             disabled={!selectedCommunity || isSending || fetchingMessages}
             maxLength={500}
           />
           <button
             onClick={handleSendMessage}
             disabled={!selectedCommunity || isSending || message.trim() === "" || fetchingMessages}
-            className={`bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg ml-4 transition ${(!selectedCommunity || isSending || message.trim() === "" || fetchingMessages) ? 'opacity-50 cursor-not-allowed' : ''
-              }`}
+            className={`bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg ml-3 md:ml-4 transition ${(!selectedCommunity || isSending || message.trim() === "" || fetchingMessages) ? 'opacity-50 cursor-not-allowed' : ''
+              } text-sm md:text-base`}
           >
             {isSending ? 'Sending...' : 'Send'}
           </button>
@@ -333,7 +386,7 @@ const CommunityChat = () => {
       </div>
 
       <aside
-        className="w-96 bg-gray-800 p-6 overflow-y-auto border-l border-gray-700 flex-col items-center"
+        className={`hidden md:flex w-80 bg-gray-800 p-4 md:p-6 overflow-y-auto border-l border-gray-700 flex-col ${showSidebar ? 'fixed inset-0 z-50' : ''}`}
         style={{
           scrollbarWidth: 'none',
           msOverflowStyle: 'none'

@@ -4,10 +4,12 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Creator = require('../../../models/Creator');
 
-const JWT_SECRET = process.env.JWT_SECRET || 'CheckCheckHello123Mic123helllohello';
+
 
 router.post('/', async (req, res) => {
     try {
+        const JWT_SECRET = process.env.JWT_SECRET ;
+        
         const { email, password } = req.body;
 
         if (!email || !password) {

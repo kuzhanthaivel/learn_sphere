@@ -31,7 +31,6 @@ const CourseCard = ({
   id,
   category,
   coverImage,
-  isSelected,
   onClick,
   title,
   completedAt,
@@ -42,7 +41,7 @@ const CourseCard = ({
     : CoverImage1;
   return (
     <div
-      className="bg-white p-2 shadow-2xl cursor-pointer w-56 rounded-lg transition-transform hover:scale-105"
+      className="bg-white p-2 shadow-2xl cursor-pointer w-52 rounded-lg transition-transform hover:scale-105"
       onClick={onClick}
     >
       <div className="relative">
@@ -64,7 +63,7 @@ const CourseCard = ({
       <div className="flex justify-between items-center w-full pt-2">
         <span className="text-lg font-semibold">View Credential</span>
         <BsArrowUpRightSquareFill
-          className={`text-2xl w-6 h-6 rounded-md ${isSelected ? "bg-white text-green-500" : "bg-green-500 text-white"
+          className={`text-2xl w-6 h-6 rounded-md "bg-white text-green-500" 
             }`}
         />
       </div>
@@ -74,7 +73,6 @@ const CourseCard = ({
 
 const ProfilePage = () => {
   const navigate = useNavigate();
-  const [selectedCourse, setSelectedCourse] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -367,9 +365,9 @@ const ProfilePage = () => {
             </div>
           </div>
 
-          <div className='px-2 sm:px-10 py-5'>
+          <div className="px-2 sm:px-10 py-5">
             <h2 className="text-2xl font-bold mb-4">Completed Courses</h2>
-            <div className="grid grid-cols-4 gap-8 mt-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 lg:gap-8 mt-5">
               {profileData.completedCourses?.map((course) => (
                 <div key={course.certificateID} className="flex justify-center">
                   <CourseCard
@@ -377,7 +375,6 @@ const ProfilePage = () => {
                     title={course.title}
                     coverImage={course.coverImage}
                     category={course.category}
-                    isSelected={selectedCourse === course.certificateID}
                     onClick={() => navigate(`/Certificate/${course.certificateID}`)}
                     completedAt={course.completedAt}
                     certificateID={course.certificateID}
@@ -386,6 +383,7 @@ const ProfilePage = () => {
               ))}
             </div>
           </div>
+
         </div>
       </div>
 
@@ -398,11 +396,28 @@ const ProfilePage = () => {
           Copy the URL to share your profile in the socials
         </button>
         <button
-          onClick={() => navigate(`/sharableProfile/${profileData.id}`)}
+          onClick={async () => {
+            const shareUrl = `${window.location.origin}/sharableProfile/${profileData.id}`;
+            const shareData = {
+              title: 'Profile Link',
+              text: 'Check out this profile!',
+              url: shareUrl,
+            };
 
+            try {
+              if (navigator.share) {
+                await navigator.share(shareData);
+              } else {
+                await navigator.clipboard.writeText(shareUrl);
+                alert('Link copied to clipboard!');
+              }
+            } catch (err) {
+              console.error('Sharing failed:', err);
+            }
+          }}
           className="bg-green-400 text-white px-4 py-2 rounded-xl shadow-md hover:bg-red-500 transition"
         >
-          Copy
+          Share
         </button>
       </div>
 

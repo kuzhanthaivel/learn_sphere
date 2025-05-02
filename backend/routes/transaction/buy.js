@@ -98,9 +98,6 @@ router.post('/', async (req, res) => {
       status: 'Completed',
     });
 
-
-    console.log(transaction);
-
     await Promise.all([
       student.save({ session }),
       exchangeCode.save({ session }),

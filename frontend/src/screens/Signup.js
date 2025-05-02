@@ -102,7 +102,6 @@ const SignUp = () => {
       if (!response.ok) {
         throw new Error(result.error || 'Signup failed');
       }
-      console.log('Signup successful:', result);
       navigate('/signin');
     } catch (error) {
       console.error('Signup error:', error);
@@ -121,7 +120,7 @@ const SignUp = () => {
           <div className="absolute bg-white w-full max-w-2xl p-8 rounded-2xl shadow-lg -top-4 -left-4 border-gray-200 border">
             <div className="text-center mb-6">
               <h1 className="text-3xl font-bold text-[#FF7F00] mb-2">SIGN UP</h1>
-              <p className="text-gray-600">Create your developer profile</p>
+              <p className="text-gray-600">Create your Student profile</p>
             </div>
 
             {submitError && (

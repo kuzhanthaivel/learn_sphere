@@ -43,7 +43,6 @@ router.get('/', async (req, res) => {
       exchangeId: transaction.exchangeData?._id.toString() || 'N/A'
     }));
 
-    console.log(formattedTransactions);
     res.json(formattedTransactions);
   } catch (error) {
     if (error.name === 'JsonWebTokenError') {

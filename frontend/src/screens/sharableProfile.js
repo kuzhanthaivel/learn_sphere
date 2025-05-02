@@ -75,7 +75,6 @@ const CourseCard = ({
 export default function Page() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [selectedCourse, setSelectedCourse] = useState(null);
   const [profileData, setProfileData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -382,8 +381,7 @@ export default function Page() {
                 title={course.title}
                 coverImage={course.coverImage}
                 category={course.category}
-                isSelected={selectedCourse === course.certificateID}
-                onClick={() => setSelectedCourse(course.certificateID)}
+                onClick={() => navigate(`/Certificate/${course.certificateID}`)}
                 completedAt={course.completedAt}
                 certificateID={course.certificateID}
               />

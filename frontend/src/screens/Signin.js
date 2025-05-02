@@ -29,7 +29,6 @@ const LoginPage = () => {
         throw new Error(data.error || "Failed to sign in.");
       }
       localStorage.setItem('studentToken', data.token);
-      console.log("Login successful:", data);
 
       navigate("/Home");
     } catch (err) {
